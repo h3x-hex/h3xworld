@@ -62,7 +62,7 @@ function Home() {
     {
       isMobile ?
 
-      <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-950 text-white' ref={homeRef}>
+      <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-900 text-white' ref={homeRef}>
         <div className='h-full relative z-0'>
         <div className='flex flex-col pt-16 gap-16 '>
           <div className='flex flex-col mx-auto gap-3 pl-3'>
