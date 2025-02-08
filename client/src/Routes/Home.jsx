@@ -120,7 +120,7 @@ function Home() {
               <p>for more storage (Free Tier 1GB)</p>
               <div className="flex flex-col pt-8">
                 {pricingOptions.map((option, index) => (
-                  <div key={index} className=" p-2">
+                  <div key={index} className="w-96 mx-auto pb-6">
                     <div className="p-10 border border-warning rounded-xl">
                       <p className="text-4xl mb-8 border-b-2 border-warning">
                         {option.title}
