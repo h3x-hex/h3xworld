@@ -16,6 +16,8 @@ import Post from '../components/Profile/Post';
 import Campaigns from '../components/Profile/Campaigns';
 import h3xClusive from '../components/Profile/h3xClusive';
 import H3xClusive from '../components/Profile/h3xClusive';
+import Collections from '../components/Profile/Collections';
+import Clubs from '../components/Profile/Clubs';
 
 
 export default function Profile () {
@@ -61,7 +63,7 @@ export default function Profile () {
         }
         else if (socialPlatform == 'Twitter')
         {
-            return "https://duet-cdn.vox-cdn.com/thumbor/0x0:1600x1600/640x427/filters:focal(800x800:801x801):format(webp)/cdn.vox-cdn.com/uploads/chorus_asset/file/24805464/F1x5VdQX0AA9Sgt.jpeg"
+            return "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/X_logo.jpg/900px-X_logo.jpg"
         }
         else if (socialPlatform == 'Instagram')
         {
@@ -126,7 +128,7 @@ export default function Profile () {
     const switchTab = (tab) => {
 
         console.log(tab);
-        console.log(currentUser)
+        console.log(authUser.uid)
         if(tab == 1){
             if (document) {
     
@@ -268,7 +270,7 @@ export default function Profile () {
             {
                 isMobile ?
 
-                <div className='h-screen w-screen bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-900 text-white '>
+                <div className='h-screen w-screen bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-gray-800 to-stone-950 text-white '>
 
                     {
                         currentUser ?
@@ -277,7 +279,7 @@ export default function Profile () {
                         :
                         <></>
                     }
-                    <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-900 relative z-0'>
+                    <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-gray-800 to-stone-950 relative z-0'>
                         <div className='flex flex-col gap-3'>
                             <div className="avatar mx-auto">
                                 <div className="w-36 rounded-full ring ring-offset-2">
@@ -378,7 +380,7 @@ export default function Profile () {
                                     <></>
                                 }
                                 <div className='pt-8'>
-                                    <div role="tablist" className="tabs tabs-boxed bg-transparent text-black mx-auto overflow-x-scroll">
+                                    <div role="tablist" className="tabs tabs-boxed bg-transparent text-black mx-auto overflow-x-scroll scrollbar-none">
                                         
                                         <a id='profileTab1' role="tab" className="tab text-white" onClick={() => switchTab(1)}>Portfolio</a>
                                         <a id='profileTab2' role="tab" className="tab text-white" onClick={() => switchTab(2)}>Posts</a>
@@ -392,7 +394,7 @@ export default function Profile () {
                                 </div>
                                 <div className=''>
                                     {
-                                        profileUser.username === authUser.displayName ?
+                                        profileUser.displayName === authUser.displayName ?
 
                                         tab === 1 ?
 
@@ -748,46 +750,60 @@ export default function Profile () {
                                 </div>
                                 <div className='pb-8'>
                                     {
-                                        profileUser.username === authUser.displayName ?
+                                        
 
                                         
-                                            tab === 1 ?
+                                            tab == 1 ?
     
                                             <>
                                                 <Portfolio profileUser={profileUser}/>
                                             </>
                                             :
     
-                                            tab === 2 ?
+                                            tab == 2 ?
     
                                             <>
-                                                <Blog profileUser={profileUser}/>
+                                                <Post profileUser={profileUser}/>
                                             </>
                                             :
     
-                                            tab === 3 ?
+                                            tab == 3 ?
     
                                             <>
-                                                <Campaigns/>
+                                                <Collections/>
                                             </>
                                             :
                                             
 
-                                            tab === 4 ?
+                                            tab == 4 ?
     
                                             <>  
-                                                <H3xClusive />
+                                                <Campaigns/>
+                                                
                                             </>
                                             :
     
-                                            tab === 5 ?
+                                            tab == 5 ?
+    
+                                            <>
+                                                <H3xClusive />
+                                                
+                                            </>
+                                            :
+    
+                                            tab ==  6 ?
+    
+                                            <>
+                                                <Clubs/>
+                                            </>
+                                            :
+                                            tab ==  7 ?
     
                                             <>
                                                 <Shop profileUser={profileUser}/>
                                             </>
                                             :
-    
-                                            tab === 6 ?
+                                            tab ==  8 ?
     
                                             <>
                                                 <Links profileUser={profileUser}/>
@@ -796,9 +812,7 @@ export default function Profile () {
                                             <>
                                             
                                             </>
-                                        :
-                                        <>
-                                        </>
+                                       
                                     }
                                 </div>
                             </div>

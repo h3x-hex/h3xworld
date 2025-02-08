@@ -29,7 +29,7 @@ export const features = [
     icon: <CreditCardIcon />,
     text: "h3xCard for In-person networking",
     description:
-      "h3xCard is a NFC Business Card to network with people and share link to your h3x.world profile with a single tap.",
+      "h3xCard is a NFC Business Card and a Digital Card on your wallet to network with people and share link to your h3x.world profile with a single tap or a quick scan of the QR Code.",
   },
   {
     icon: <DollarSignIcon />,

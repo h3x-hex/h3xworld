@@ -18,7 +18,9 @@ export default function Portfolio ({profileUser}) {
 
     useEffect(() => {
         const db = getDatabase();
-        const postRef = ref(db, 'Posts/' + profileUser.username + 'Portfolio');
+        const path = 'Posts/' + profileUser.username + 'Portfolio/'
+        const postRef = ref(db, path);
+        console.log(path)
         onValue(postRef, (snapshot) => {
             const data = snapshot.val();
             setPosts(data);
@@ -64,16 +66,11 @@ export default function Portfolio ({profileUser}) {
                     <p className="text-2xl font-bold pt-8">Portfolio</p>
                     <div className='divider divider-warning my-0 w-5/12 mx-auto'></div>
                 </div>
-                <div className="flex flex-col mx-auto px-3 gap-3 pb-8">
-                    {
-                        Object.keys(posts).map((post) => {
-                            console.log(post)
-                            return (
-                                <>
+                <div className="grid grid-cols-3 mx-auto px-3 gap-3 pb-8">
+                    
                             <div key={post} className="card bg-transparent w-full shadow-xl">  
                                 <div className="card-body mx-auto">
                                     <div className='flex flex-col gap-1'>
-
                                         <div className='flex flex-row gap-2 absolute left-3'>
                                             <div tabIndex={0} role="button" className="btn btn-outline border-warning hover:border-warning btn-circle avatar">
                                                 <div className="w-10 rounded-full">
@@ -82,28 +79,17 @@ export default function Portfolio ({profileUser}) {
                                                     src={posts[post].postUserPhotoURL} />
                                                 </div>
                                             </div>
-                                            <div className='flex flex-row gap-3'>
-                                                <p className='text-lg font-bold'>{posts[post].postUserFullName}</p>
-                                                <p className='text-md pt-[2px]'>@{posts[post].postUsername}</p>
-                                            </div>
                                         </div>
-                                        <div className='pt-12 mx-auto flex flex-col '>
-                                            <h2 className="text-xl mx-auto">{posts[post].postContent}</h2>
-                                        </div>
+                                        
                                         <div className="carousel w-64 mx-auto pt-12">
-                                            {   
-                                                posts[post].files.map((postImg) => {
-                                                    {console.log(postImg)}
-                                                    return(<div className="carousel-item w-full h-full">
-                                                        <img
-                                                            src={postImg}
-                                                            className="w-full"
-                                                            alt={posts[post].postContent}
-                                                            onClick={() => showPostMedia(postImg)}
-                                                        />
-                                                    </div>
-                                                )})
-                                            }                                    
+                                            <div className="carousel-item w-full h-full">
+                                                <img
+                                                    src='/public/logo.png'
+                                                    className="w-full"
+                                                    
+                                                    
+                                                />
+                                            </div>
                                         </div>
                                         
 
@@ -119,10 +105,6 @@ export default function Portfolio ({profileUser}) {
                                     <button className='btn btn-warning w-full btn-outline' onClick={() => {if(document)document.getElementById('postAwardModal').showModal()}}>Mint Post as NFT </button>
                                 </div>
                             </div>
-                            
-                            </>
-                        )})
-                    }
                 </div>
             </>
 
@@ -133,74 +115,48 @@ export default function Portfolio ({profileUser}) {
                 <div className='divider divider-warning my-0 w-2/12 mx-auto'></div>
 
             </div>
-            <div className="flex flex-col w-4/12 mx-auto gap-3">
+            <div className='container w-6/12 mx-auto pt-8'>
+            <div className="grid grid-cols-3 mx-auto gap-3">
             
-            {
-                    Object.keys(posts).map((post) => {
-                        return (
-                            <>
-                            <div key={post} className="card bg-transparent w-full shadow-xl">  
-                                <div className="card-body">
-                                    <div className='flex flex-col gap-1'>
-
-                                        <div className='flex flex-row gap-2 absolute left-3'>
-                                            <div tabIndex={0} role="button" className="btn btn-outline border-warning hover:border-warning btn-circle avatar">
-                                                <div className="w-10 rounded-full">
-                                                <img
-                                                    alt="Profile Photo"
-                                                    src={posts[post].postUserPhotoURL} />
-                                                </div>
-                                            </div>
-                                            <div className='flex flex-row gap-3'>
-                                                <p className='text-lg font-bold'>{posts[post].postUserFullName}</p>
-                                                <p className='text-md pt-[2px]'>@{posts[post].postUsername}</p>
-                                            </div>
-                                        </div>
-                                        <div className='pt-16'>
-                                            <h2 className="text-xl ">{posts[post].postContent}</h2>
-                                        </div>
-                                        <div className="carousel w-64 mx-auto pt-12">
-                                            {   
-                                                posts[post].files.map((postImg) => {
-                                                    {console.log(postImg)}
-                                                    return(<div className="carousel-item w-full h-full cursor-pointer">
-                                                        <img
-                                                            src={postImg}
-                                                            className="w-full"
-                                                            alt={posts[post].postContent}
-                                                            onClick={() => showPostMedia(postImg)}
-                                                        />
-                                                    </div>
-                                                )})
-                                                
-                                            }                                    
-                                        </div>
-                                        
+                            <div  className="card w-full shadow-xl">  
+                                <div className="card-body hover:border-warning border-[1px] rounded-xl h-full w-full ">
+                                    <div className="h-full w-full cursor-pointer">
+                                        <img
+                                            src='/public/logo.png'
+                                            className="h-full w-full"
+                                            
+                                           
+                                        />
                                     </div>
-                                    
-                                </div>
-                                <div className='flex flex-row gap-3 pl-3'>
-                                    <div className='flex flex-row'>
-                                        <button className='btn btn-ghost w-1'>{posts[post].likesCount}</button>
-                                        <button className='btn btn-ghost' onClick={() => updateLike()}><img src={'/like.png'} width={24} height={24}/></button>
-                                    </div>
-                                    <div className='flex flex-row'>
-                                        <button className='btn btn-ghost w-1'>{posts[post].commentsCount}</button>
-                                        <button className='btn btn-ghost' onClick={() => updateLike()}><img src={'/comment.png'} width={24} height={24}/></button>
-                                    </div>
-                                    <div className='flex flex-row'>
-                                        <button className='btn btn-ghost w-1'>{posts[post].postAwards}</button>
-                                        <button className='btn btn-ghost' onClick={() => {if(document)document.getElementById('postAwardModal').showModal()}}><img src={'/postAward.png'} width={24} height={24}/></button>
-                                    </div>
-                                </div>
-                                <div className='w-full'>
-                                    <button className='btn btn-warning w-full btn-outline'>Mint Post as NFT </button>
                                 </div>
                             </div>
-                        
-                        </>
-                    )})
-                }
+
+                            <div  className="card w-full shadow-xl">  
+                                <div className="card-body hover:border-warning border-[1px] rounded-xl h-full w-full ">
+                                    <div className="h-full w-full cursor-pointer">
+                                        <img
+                                            src='/public/logo.png'
+                                            className="h-full w-full"
+                                            
+                                           
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div  className="card w-full shadow-xl">  
+                                <div className="card-body hover:border-warning border-[1px] rounded-xl h-full w-full ">
+                                    <div className="h-full w-full cursor-pointer">
+                                        <img
+                                            src='/public/logo.png'
+                                            className="h-full w-full"
+                                            
+                                           
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+            </div>
         </div>
         <dialog id="viewPortfolioPhotoModal" className="modal">
             <div className="modal-box bg-stone-900">

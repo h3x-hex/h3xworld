@@ -135,7 +135,7 @@ export default function Navbar ({currentUser}){
                                 <div className="w-10 rounded-full">
                                 <img
                                     alt="Profile Photo"
-                                    src={user.photoURL} />
+                                    src={user.photoURL}/>
                                 </div>
                             </div>
                             <ul

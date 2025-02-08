@@ -62,12 +62,13 @@ function Home() {
     {
       isMobile ?
 
-      <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-900 text-white' ref={homeRef}>
+      <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-stone-950 via-stone-950 to-stone-900 text-white' ref={homeRef}>
         <div className='h-full relative z-0'>
         <div className='flex flex-col pt-16 gap-16 '>
           <div className='flex flex-col mx-auto gap-3 pl-3'>
-            <h1 className='text-5xl'>Welcome to h<span className='text-[#d69e2e]'>3</span>x<span className='text-[#888888]'>|</span>World</h1>
-            <h1 className='text-2xl'>Web3 Social Media for creators, artists, and entrepreneurs.</h1>
+            <img className='mx-auto' src='/logo.png' width={256}/>
+            <h1 className='text-5xl text-center'>Welcome to h<span className='text-[#d69e2e]'>3</span>x<span className='text-[#888888]'>.</span>world</h1>
+            <h1 className='text-lg text-center'>Web3 Social Media for creators, artists, and entrepreneurs.</h1>
           </div>
           <div className='flex flex-col mx-auto pr-3 gap-3'>
             <div className='flex flex-col gap-3 items-center justify-center'>
@@ -156,7 +157,7 @@ function Home() {
               <span className="bg-neutral-900 text-warning rounded-full h-12 text-3xl font-medium px-6 py-3">
                 Buy h3xCard
               </span>
-              <p>Fun fact: Card is in 3D Space, you can move it around.</p>
+              <p className='pt-3'>Fun fact: Card is in 3D Space, you can move it around.</p>
               <div className="flex flex-wrap py-8 h-96">
                 <Canvas className='w-screen h-screen'>
                   <ambientLight intensity={100}/>
@@ -176,8 +177,8 @@ function Home() {
     
     </div>
     :
-    <div className='h-full w-screen bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-950 text-white' ref={homeRef}>
-      <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-950 relative z-0'>
+    <div className='h-full w-screen bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-stone-950 via-stone-950 to-stone-900 text-white' ref={homeRef}>
+      <div className='h-full bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-stone-950 via-stone-950 to-stone-900  relative z-0'>
           <div className='flex flex-col pt-36 gap-36'>
             <div className='flex flex-col mx-auto text-center'>
               <h1 className='text-[96px]'>Welcome to h<span className='text-[#D69E2E]'>3</span>x<span className='text-[#888888]'>.</span>world</h1>
@@ -271,7 +272,7 @@ function Home() {
               <span className="bg-neutral-900 text-warning rounded-full h-12 text-3xl font-medium px-6 py-3">
                 Buy h3xCard
               </span>
-              <p>Fun fact: Card is in 3D Space, you can move it around.</p>
+              <p className='pt-6'>Fun fact: Card is in 3D Space, you can move it around.</p>
               <div className="flex flex-wrap py-8 h-screen">
                 <Canvas className='w-96 h-96'>
                   <ambientLight intensity={100}/>
@@ -282,7 +283,7 @@ function Home() {
               <button className='btn btn-warning rounded-full' onClick={() => scrollToSection(homeRef)}>Coming Soon...</button>
             </div>
           </div>
-          <StarsCanvas />
+          <StarsCanvas/>
       </div>
     </div>
     }

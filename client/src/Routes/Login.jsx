@@ -103,7 +103,7 @@ function Login() {
         </div>
       </div>
     :
-    <div className='h-screen bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-900 text-white'>
+    <div className='h-screen w-screen bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))]  from-gray-800 via-stone-900 to-stone-900 text-white'>
       <div className='h-screen relative z-0'>
       <div className='flex flex-col pt-36 gap-36 '>
         <div className='flex mx-auto'>
