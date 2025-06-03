@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  name              String 
+  username          String?
+  email             String @unique
+  emailVerified     String?
+  password          String?
+  pin               String?
+  wallet            String?
+  createdAt         DateTime @default(now())
+  address           String?
+  accountAddress    String?
+  followers         Int?
+  following         Int?
+  subscribers       Int?
+}
+
+model Booking {
+  id             String   @id @default(cuid()) @map("_id") 
+  buyerId        String
+  creatorId      String
+  serviceTitle   String
+  servicePrice   Float
+  date           DateTime
+  timeSlot       String
+  status         BookingStatus @default(PENDING)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  completedAt    DateTime?
+  disputeReason  String?
+  resolutionNote String?
+  paymentHeld    Boolean @default(true)
+  reviewed       Boolean @default(false)
+}
+
+model Chat {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  participants String[] // Array of user IDs or addresses
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId    String
+  sender    String
+  content   String
+  timestamp DateTime @default(now())
+}
+
+
+
+model Like {
+  id            String @id @default(cuid()) @map("_id")
+  postId        String @unique
+  userIds       String[]
+}
+
+enum BookingStatus {
+  PENDING        // waiting for creator to confirm
+  CONFIRMED      // creator confirmed
+  CANCELLED      // cancelled by either party
+  COMPLETED      // successfully happened
+  NO_SHOW        // someone didn’t show up
+  DISPUTED       // buyer flagged issue
+  RESOLVED       // admin resolved dispute
+  PAID           // funds released to creator
+}
+
+model VerificationToken {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String
+  token String
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+

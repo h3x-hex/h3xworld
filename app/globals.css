@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@plugin "tailwindcss-animate";
+
+@plugin "daisyui";
+
+@custom-variant dark (&:is(.dark *));
+
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+
+.custom-textarea::before {
+  pointer-events: none;
+}
+
+.carousel .control-dots .dot {
+  background: #888;
+  opacity: 0.5;
+}
+
+.carousel .control-dots .dot.selected {
+  background: #eab308; /* Tailwind yellow-500 */
+  opacity: 1;
+}
+
+.hide-scrollbar {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}

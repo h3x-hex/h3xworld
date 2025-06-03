@@ -1,0 +1,4 @@
+textarea::before {
+    pointer-events: none;
+  }
+  

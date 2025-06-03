@@ -1,0 +1,41 @@
+.create-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.create-btn {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.create-bnt:hover {
+    background: #333333;
+}
+
+.create-options {
+    display: hidden;
+    position: absolute;
+    top: -150%;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 10px;
+}
+
+.create-wrapper:hover .create-options,
+.create-wrapper.active .create-options {
+    display: flex;
+}
+
+.option-btn {
+    background: #222222;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.option-btn:hover {
+    background: #444444;
+}
