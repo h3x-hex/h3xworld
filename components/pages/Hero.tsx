@@ -174,12 +174,14 @@ export default function Hero() {
                 <h1 className="mt-2 text-7xl font-bold tracking-tight text-balance text-gray-100">
                  h<span className='text-yellow-500'>3</span>x<span className='text-gray-300'>.</span>world
                 </h1>
-                <p className="mt-8 text-lg font-medium text-pretty text-gray-300 sm:text-lg">
+                <p className="mt-8 text-xl font-medium text-pretty text-gray-300 sm:text-2xl">
                     Social Media for creators, hustlers, and entrepreneurs.
+                </p>
+                <p className=" text-md font-medium text-pretty text-gray-300 sm:text-lg">
+                    Get your link up and Link up!!!
                 </p>
                 <p className="text-gray-400">
                     Currently in beta.
-                    
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                 <button
