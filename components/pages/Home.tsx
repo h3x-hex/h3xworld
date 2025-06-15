@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import { fetchPostsForYou } from '@lens-protocol/client/actions';
-import { evmAddress, Post, PostForYou } from '@lens-protocol/client';
+import { fetchPostsForYou, fetchTimeline } from '@lens-protocol/client/actions';
+import { evmAddress, Post, PostForYou, TimelineItem } from '@lens-protocol/client';
 import { client } from '@/helper/lensClient';
 import { userAtom } from '@/store/authState';
 import { useAtom } from 'jotai';
@@ -43,7 +43,7 @@ const HomeFeed = () => {
         },
       });*/
 
-      const result = await fetchPostsForYou(client, {
+      const result = await fetchTimeline(client, {
         account: evmAddress(user.accountAddress!)
       });
 
@@ -54,7 +54,7 @@ const HomeFeed = () => {
       }
 
       const { items } = result.value;
-      const posts = items.filter((item: PostForYou) => item.__typename === 'PostForYou' && item.post?.__typename === 'Post').map((item: PostForYou) => item.post);
+      const posts = items.filter((item: TimelineItem) => item.__typename === 'TimelineItem' && item.primary?.__typename === 'Post').map((item: TimelineItem) => item.primary);
       console.log(posts)
       setPosts(posts);
       setIsLoading(false);
