@@ -59,7 +59,7 @@ const Profile = () => {
     address: '',
   });
 
-  const tabs = ['Posts', 'Portfolio', 'h3xclusive', 'Shop', 'Links', 'Bookings', 'Clubs', 'About']
+  const tabs = ['Home', 'Posts', 'Portfolio', 'h3xclusive', 'Shop', 'Links', 'Bookings', 'Events', 'Clubs', 'About']
   const tabRefs = useRef<Record<string, MutableRefObject<HTMLButtonElement | null>>>({})
 
   const searchParams = useSearchParams()

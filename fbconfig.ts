@@ -1,3 +1,5 @@
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 
 export const fbconfig = {
     apiKey: "AIzaSyApK_qiHWDcoRqiNp1_0jDHbMaogkGx1v8",
@@ -9,5 +11,9 @@ export const fbconfig = {
     databaseURL: "https://hexworld369888-default-rtdb.asia-southeast1.firebasedatabase.app/",
     measurementId: "G-W3E9GJMZVR"
   };
+
+  const app = !getApps().length ? initializeApp(fbconfig) : getApp();
+  const db = getDatabase(app);
+  
   
   export default fbconfig;

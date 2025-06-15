@@ -5,7 +5,8 @@ import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useTypewriter, Cursor } from 'react-simple-typewriter'
 import { Canvas } from '@react-three/fiber';
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, push, ref, set } from "firebase/database";
+import { db } from '@/lib/firebase'
 import { OrbitControls } from "@react-three/drei"
 import H3xCard from '../H3xCard'
 import { useMediaQuery } from 'react-responsive'
@@ -59,13 +60,13 @@ export default function Hero() {
 
     function addUserToWaitlist(){
     
-        const db = getDatabase();
         /*emails.forEach((x) =>{
           const timestamp = new Date().getTime();
           set(ref(db, `Waitlist/${timestamp}`), x);
         })*/
         const dbRef = ref(db, 'Waitlist/')
-        set(dbRef, email);
+        const newWaitlistUser = push(dbRef);
+        set(newWaitlistUser,email);
         setAddedToWaitlist(true);
       }
 
