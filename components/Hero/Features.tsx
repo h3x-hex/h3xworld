@@ -14,7 +14,7 @@ const sections = [
 
 export default function Features() {
   return (
-    <div className="bg-black text-white space-y-32 py-20 px-6 sm:px-12">
+    <div className="bg-stone-950 text-white space-y-32 py-20 px-6 sm:px-12">
       {sections.map((s, i) => (
         <FeatureBlock key={s.title} {...s} reverse={i % 2 !== 0} />
       ))}
