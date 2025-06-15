@@ -301,7 +301,6 @@ export default function Hero() {
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Book/Sell Appointments and Services</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Sell Digital Products</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> h3xclusive Members-only Content</li>
-                        <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Create Clubs for community building</li>
                     </ul>
                 </div>
 
@@ -316,10 +315,11 @@ export default function Hero() {
                     <p className="text-yellow-500 text-3xl font-bold mb-4">$8.88<span className="text-sm text-stone-400">/month</span></p>
                     <ul className="text-sm text-stone-300 space-y-1 gap-3 flex flex-col">
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> All Free Plan features</li>
+                        <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Create Clubs for community building</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Advanced Analytics</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Verified Badge</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> 100GB Storage for Shop and Content (Unlimited after beta)</li>
-                        <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> More features coming soon</li>
+                        <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> AI integration, Ad Credits and more features coming soon after beta</li>
                     </ul>
                 </div>
 
@@ -337,7 +337,7 @@ export default function Hero() {
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Golden Verified Badge</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> Featured Feed Visibility</li>
                         <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> 1TB Storage for Shop and Content (Unlimited after beta)</li>
-                        <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> AI integration and more features coming soon</li>
+                        <li className='flex'><CheckIcon className="h-5 w-5 text-yellow-500 mr-1" /> AI integration, Ad Credits and more features coming soon after beta</li>
                     </ul>
                 </div>
               </div>
