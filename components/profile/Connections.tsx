@@ -7,7 +7,7 @@ import { userAtom } from '@/store/authState'
 import { useAtom } from 'jotai';
 
 interface Props {
-    initialTab: 'Followers' | 'Following' | 'Subscriptions' | 'Subscribers'
+    initialTab: string
 }
 
 export default function ConnectionsView({ initialTab }: Props) {
