@@ -1,8 +1,8 @@
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import { fetchPostsForYou, fetchTimeline } from '@lens-protocol/client/actions';
-import { evmAddress, Post, PostForYou, TimelineItem } from '@lens-protocol/client';
+import { fetchTimeline } from '@lens-protocol/client/actions';
+import { evmAddress, Post, TimelineItem } from '@lens-protocol/client';
 import { client } from '@/helper/lensClient';
 import { userAtom } from '@/store/authState';
 import { useAtom } from 'jotai';
