@@ -5,7 +5,7 @@ import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useTypewriter, Cursor } from 'react-simple-typewriter'
 import { Canvas } from '@react-three/fiber';
-import { getDatabase, push, ref, set } from "firebase/database";
+import {  push, ref, set } from "firebase/database";
 import { db } from '@/lib/firebase'
 import { OrbitControls } from "@react-three/drei"
 import H3xCard from '../H3xCard'
