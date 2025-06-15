@@ -69,6 +69,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
     setLiked(post?.operations?.hasUpvoted!);
     setReposted(post?.operations?.hasReposted!.optimistic!);
     setBookmarked(post?.operations?.hasBookmarked!);
+    setComments(post.stats.comments);
+    setReposts(post.stats.reposts);
+    setBookmarks(post.stats.bookmarks);
     console.log(post?.operations)
 
   }, [post, user])

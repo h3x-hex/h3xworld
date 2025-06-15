@@ -11,7 +11,6 @@ import { handleOperationWith } from '@lens-protocol/client/ethers';
 import { link, MediaImageMimeType, MetadataAttributeType } from '@lens-protocol/metadata';
 import { ethers } from 'ethers';
 import Image from 'next/image';
-import div from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react'
 import { useAtom } from 'jotai';

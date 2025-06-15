@@ -8,7 +8,7 @@ import Sidebar from '../nav/Sidebar'
 import { BriefcaseIcon, ChatBubbleOvalLeftEllipsisIcon, CurrencyDollarIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import RightSidebar from '../nav/RightSidebar'
 import { evmAddress } from "@lens-protocol/client";
-import { currentSession, fetchAccount, fetchFollowers, fetchFollowing, fetchFollowStatus, follow, unfollow } from "@lens-protocol/client/actions";
+import { fetchAccount, fetchFollowers, fetchFollowing, fetchFollowStatus, follow, unfollow } from "@lens-protocol/client/actions";
 
 import { client } from "../../helper/lensClient";
 import { motion } from 'framer-motion'
@@ -93,6 +93,8 @@ const Profile = () => {
         block: 'nearest',
       });
     }
+
+    setSubscribersCount(0);
     const fetch = async () => {
 
       const result = await fetchAccount(client, {

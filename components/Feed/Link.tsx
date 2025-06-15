@@ -1,9 +1,8 @@
 'use client'
 
 import { client } from '@/helper/lensClient'
-import { AnyPost, evmAddress, Post } from '@lens-protocol/client'
+import { evmAddress, Post } from '@lens-protocol/client'
 import { fetchPosts } from '@lens-protocol/client/actions'
-import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 interface PostsFeedProps {
@@ -19,7 +18,7 @@ const LinksGrid = ({address}: PostsFeedProps) => {
 
     const fetchLinks = async () => {
       setIsLoading(true);
-  
+      console.log(isLoading)
       const result = await fetchPosts(client, {
         filter: {
           authors: [evmAddress(address)],
