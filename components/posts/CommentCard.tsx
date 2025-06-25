@@ -31,31 +31,27 @@ import { lensAccountOnly } from '@lens-chain/storage-client'
 import { chains } from '@lens-chain/sdk/viem'
 import { goldColor, greyColor, whiteColor } from '@/constants/colors'
 
-interface PostCardProps {
-  postItem: Post
+
+interface CommentCardProps {
+  comment: Post;
+  onReply?: (commentId: string) => void;
 }
 
-interface PostAttachment {
-  item: string,
-  type: MediaImageMimeType,
-}
+const CommentCard: React.FC<CommentCardProps> = ({ comment, onReply }) => {
 
-
-const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
-  const timestamp = postItem.timestamp
-    ? moment(postItem.timestamp).fromNow()
-    : 'just now'
-
+  const timestamp = comment.timestamp
+      ? moment(comment.timestamp).fromNow()
+      : 'just now'
   const [media, setMedia] = useState<string[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [liked, setLiked] = useState(postItem.operations?.hasUpvoted || false)
-  const [bookmarked, setBookmarked] = useState(postItem.operations?.hasBookmarked || false)
-  const [reposted, setReposted] = useState(postItem.operations?.hasReposted.optimistic || false)
-  const [likes, setLikes] = useState(postItem.stats.upvotes || 0)
-  const [comments, setComments] = useState(postItem.stats.comments || 0)
-  const [reposts, setReposts] = useState(postItem.stats.reposts || 0)
-  const [quotes, setQuotes] = useState(postItem.stats.quotes || 0)
-  const [bookmarks, setBookmarks] = useState(postItem.stats.bookmarks || 0)
+  const [liked, setLiked] = useState(comment.operations?.hasUpvoted || false)
+  const [bookmarked, setBookmarked] = useState(comment.operations?.hasBookmarked || false)
+  const [reposted, setReposted] = useState(comment.operations?.hasReposted.optimistic || false)
+  const [likes, setLikes] = useState(comment.stats.upvotes || 0)
+  const [comments, setComments] = useState(comment.stats.comments || 0)
+  const [reposts, setReposts] = useState(comment.stats.reposts || 0)
+  const [quotes, setQuotes] = useState(comment.stats.quotes || 0)
+  const [bookmarks, setBookmarks] = useState(comment.stats.bookmarks || 0)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [dropdownOpen, setDropDownOpen] = useState(false)
@@ -76,19 +72,19 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
   useEffect(() => {
     if (!user) return
 
-    if (postItem.metadata.__typename === "ImageMetadata") {
-      const images = [postItem.metadata.image.item]
-      const attachments = postItem.metadata.attachments.map((a) => a.item)
+    if (comment.metadata.__typename === "ImageMetadata") {
+      const images = [comment.metadata.image.item]
+      const attachments = comment.metadata.attachments.map((a) => a.item)
       setMedia([...images, ...attachments])
     }
 
-    setLiked(postItem?.operations?.hasUpvoted!)
-    setReposted(postItem?.operations?.hasReposted!.optimistic!)
-    setBookmarked(postItem?.operations?.hasBookmarked!)
-    setComments(postItem.stats.comments)
-    setReposts(postItem.stats.reposts)
-    setQuotes(postItem.stats.quotes)
-    setBookmarks(postItem.stats.bookmarks)
+    setLiked(comment?.operations?.hasUpvoted!)
+    setReposted(comment?.operations?.hasReposted!.optimistic!)
+    setBookmarked(comment?.operations?.hasBookmarked!)
+    setComments(comment.stats.comments)
+    setReposts(comment.stats.reposts)
+    setQuotes(comment.stats.quotes)
+    setBookmarks(comment.stats.bookmarks)
 
     if (menuOpen) {
       document.body.classList.add("overflow-hidden")
@@ -100,7 +96,7 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
 
     return () => document.body.classList.remove("overflow-hidden")
     
-  }, [postItem, user])
+  }, [comment, user])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -139,71 +135,12 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
     
   }
 
-  const postInteraction = async (interaction: string) => {
-    const resumed = await client.resumeSession()
-    if (resumed.isErr()) return console.error(resumed.error)
-    const sessionClient = resumed.value
-
-    if (interaction === 'like') {
-      setLiked(!liked)
-      if (!liked) {
-        setLikes(likes + 1)
-        const result = await addReaction(sessionClient, {
-          post: postId(postItem.id),
-          reaction: PostReactionType.Upvote,
-        })
-        if (result.isErr()) {
-          setLikes(likes - 1)
-          return console.error(result.error)
-        }
-      } else {
-        setLikes(likes - 1)
-        const result = await undoReaction(sessionClient, {
-          post: postId(postItem.id),
-          reaction: PostReactionType.Upvote,
-        })
-        if (result.isErr()) {
-          setLikes(likes + 1)
-          return console.error(result.error)
-        }
-      }
-    }
-
-    if (interaction === 'repost') {
-      const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!)
-      const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx')
-      const signer = wallet.connect(provider)
-
-      await repost(sessionClient, {
-        post: postId(postItem.id),
-      }).andThen(handleOperationWith(signer))
-      setReposted(true)
-    }
-
-    if (interaction === 'quote') {
-
-      
-    }
-
-    if (interaction === 'bookmark') {
-      const result = await bookmarkPost(sessionClient, {
-        post: postId(postItem.id),
-      })
-      if (result.isErr()) return console.error(result.error)
-      setBookmarked(true)
-    }
-
-    if (interaction === 'comment') {
-      router.push(`/post/${postItem.id}`)
-    }
-  }
-
   const handleCardClick = () => {
     if (justClosedModalRef.current) {
       justClosedModalRef.current = false
       return
     }
-    router.push(`/post/${postItem.id}`)
+    router.push(`/post/${comment.id}`)
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -229,20 +166,80 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
     setDragging(false)
     startY.current = null
   }
+
+  const postInteraction = async (interaction: string) => {
+    const resumed = await client.resumeSession()
+    if (resumed.isErr()) return console.error(resumed.error)
+    const sessionClient = resumed.value
+
+    if (interaction === 'like') {
+      setLiked(!liked)
+      if (!liked) {
+        setLikes(likes + 1)
+        const result = await addReaction(sessionClient, {
+          post: postId(comment.id),
+          reaction: PostReactionType.Upvote,
+        })
+        if (result.isErr()) {
+          setLikes(likes - 1)
+          return console.error(result.error)
+        }
+      } else {
+        setLikes(likes - 1)
+        const result = await undoReaction(sessionClient, {
+          post: postId(comment.id),
+          reaction: PostReactionType.Upvote,
+        })
+        if (result.isErr()) {
+          setLikes(likes + 1)
+          return console.error(result.error)
+        }
+      }
+    }
+
+    if (interaction === 'repost') {
+      const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!)
+      const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx')
+      const signer = wallet.connect(provider)
+
+      await repost(sessionClient, {
+        post: postId(comment.id),
+      }).andThen(handleOperationWith(signer))
+      setReposted(true)
+    }
+
+    if (interaction === 'quote') {
+
+      
+    }
+
+    if (interaction === 'bookmark') {
+      const result = await bookmarkPost(sessionClient, {
+        post: postId(comment.id),
+      })
+      if (result.isErr()) return console.error(result.error)
+      setBookmarked(true)
+    }
+
+    if (interaction === 'comment') {
+      router.push(`/post/${comment.id}`)
+    }
+  }
   
+
   return (
-    <div className="bg-black py-4 text-white border-b border-yellow-500 relative">
+    <div className="bg-stone-950 py-4 text-white border-b border-yellow-500 relative">
       <div onClick={handleCardClick} className='z-0'>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <img
-              src={postItem.author.metadata?.picture}
+              src={comment.author.metadata?.picture}
               alt="avatar"
               className="w-12 h-12 rounded-full border border-yellow-400"
             />
             <div>
               <div className="flex flex-row gap-2">
-                <p className="font-semibold">{postItem.author.metadata?.name}</p>
+                <p className="font-semibold">{comment.author.metadata?.name}</p>
                 <p className="text-gray-400">{timestamp}</p>
                 <button
                   onClick={handleOpenMenu}
@@ -251,49 +248,47 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
                   <EllipsisHorizontalIcon className="w-6 text-white" />
                 </button>
               </div>
-              <p className="text-gray-400">@{postItem.author.username?.localName || postItem.author.metadata?.name}</p>
+              <p className="text-gray-400">@{comment.author.username?.localName || comment.author.metadata?.name}</p>
             </div>
           </div>
 
           
         </div>
 
-        <div className='pl-[3.75rem]'>
-          {postItem.metadata.__typename === 'ImageMetadata' && (
-            <h2 className="text-md mb-2">{postItem.metadata?.title}</h2>
-          )}
+        {comment.metadata.__typename === 'ImageMetadata' && (
+          <h2 className="text-lg mb-2">{comment.metadata?.title}</h2>
+        )}
 
-          <p className="text-md text-gray-300 py-3">
-            {postItem.metadata.__typename === "TextOnlyMetadata" ? postItem.metadata.content : <></>}
-          </p>
+        <p className="text-md text-gray-300 py-3">
+          {comment.metadata.__typename === "TextOnlyMetadata" ? comment.metadata.content : <></>}
+        </p>
 
-          {postItem.metadata.__typename === "ImageMetadata" && media.length > 0 && (
-            <div onClick={(e) => e.stopPropagation()}>
-              <Carousel
-                showThumbs={false}
-                showStatus={false}
-                infiniteLoop
-                useKeyboardArrows
-                showIndicators
-                className="rounded-md overflow-hidden h-64 sm:h-96 mb-4 border border-gray-700 cursor-pointer"
-                onClickItem={(index) => {
-                  setCurrentSlide(index)
-                  setModalOpen(true)
-                }}
-              >
-                {media.map((url, idx) => (
-                  <div key={idx} className="relative w-full">
-                    <img
-                      src={url}
-                      className="object-cover rounded-lg h-64 sm:h-96 w-full cursor-pointer"
-                      alt={`media-${idx}`}
-                    />
-                  </div>
-                ))}
-              </Carousel>
-            </div>
-          )}
-        </div>
+        {comment.metadata.__typename === "ImageMetadata" && media.length > 0 && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Carousel
+              showThumbs={false}
+              showStatus={false}
+              infiniteLoop
+              useKeyboardArrows
+              showIndicators
+              className="rounded-md overflow-hidden h-64 sm:h-96 mb-4 border border-gray-700 cursor-pointer"
+              onClickItem={(index) => {
+                setCurrentSlide(index)
+                setModalOpen(true)
+              }}
+            >
+              {media.map((url, idx) => (
+                <div key={idx} className="relative w-full">
+                  <img
+                    src={url}
+                    className="object-cover rounded-lg h-64 sm:h-96 w-full cursor-pointer"
+                    alt={`media-${idx}`}
+                  />
+                </div>
+              ))}
+            </Carousel>
+          </div>
+        )}
       </div>
 
       {modalOpen && (
@@ -307,7 +302,7 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
         />
       )}
 
-      <div className="flex justify-between text-gray-400 text-sm border-t border-stone-700 pt-3 pl-[3.75rem] pr-4">
+      <div className="flex justify-between text-gray-400 text-sm border-t border-stone-700 pt-3">
         <button
           onClick={() => postInteraction('like')}
           className="flex items-center gap-2 hover:text-yellow-500 transition"
@@ -355,7 +350,7 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
       <QuoteModal
         isOpen={isQuoteOpen}
         onClose={() => setIsQuoteOpen(false)}
-        quotedPost={postItem}
+        quotedPost={comment}
         quotedPostMedia={media}
       />
 
@@ -394,7 +389,7 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
-              <button className="w-full text-left">Report postItem</button>
+              <button className="w-full text-left">Report comment</button>
               <button className="w-full text-left">Mute User</button>
               <button className="w-full text-left">Block User</button>
               {/* Simulated scroll content */}
@@ -404,7 +399,7 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PostCard;
+export default CommentCard;

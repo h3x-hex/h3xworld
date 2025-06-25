@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
+import { userAtom } from '@/store/authState';
+import { useAtom } from 'jotai';
 
 const useNavigation = () => {
   const pathname = usePathname();
@@ -14,6 +16,10 @@ const useNavigation = () => {
   const [isWalletActive, setIsWalletActive] = useState(false);
   const [isMarketplaceActive, setIsMarketplaceActive] = useState(false);
   const [isDashboardActive, setIsDashboardActive] = useState(false);
+  const [isSettingsActive, setIsSettingsActive] = useState(false);
+
+
+  const [user] = useAtom(userAtom);
 
   useEffect(() => {
     setIsHomeActive(false);
@@ -24,6 +30,7 @@ const useNavigation = () => {
     setIsWalletActive(false);
     setIsMarketplaceActive(false);
     setIsDashboardActive(false);
+    setIsSettingsActive(false);
 
     switch (pathname) {
       case '/home':
@@ -47,9 +54,15 @@ const useNavigation = () => {
       case '/dashboard':
         setIsDashboardActive(true);
         break;
+      case '/settings':
+        setIsSettingsActive(true);
+        break;
+      case `/${user.username}`:
+        setIsProfileActive(true);
+        break;
       default:
         // Handle any other cases here
-        setIsProfileActive(true);
+        
         break;
     }
   }, [pathname]);
@@ -63,6 +76,7 @@ const useNavigation = () => {
     isWalletActive,
     isMarketplaceActive,
     isDashboardActive,
+    isSettingsActive
   };
 };
 

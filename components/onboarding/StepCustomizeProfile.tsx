@@ -7,6 +7,7 @@ import { OnboardingContext } from './OnboardingWrapper'
 import ImageUploadCropper from '@/components/utils/ImageUploadCropper'
 import { PlusIcon } from '@heroicons/react/24/outline'
 import { motion } from 'framer-motion'
+import { platforms } from '@/constants/socialLinksPlatforms'
 
 const MAX_BIO_LENGTH = 160;
 const MIN_BIO_LENGTH = 0;
@@ -21,7 +22,6 @@ export default function StepCustomizeProfile() {
   const [dobError, setDOBError] = useState('')
   const isTooShort = bio.length > 0 && bio.length < MIN_BIO_LENGTH
 
-  const platforms = ['Instagram', 'Twitter', 'Facebook', 'LinkedIn', 'YouTube', 'GitHub']
 
   useEffect(() => {
     setOnboardingData(prev => ({ ...prev, bio }))

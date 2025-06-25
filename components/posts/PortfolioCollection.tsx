@@ -92,7 +92,7 @@ const PortfolioCollection = () => {
                 posts &&
 
                 (posts.map((post) => (
-                    <PostCard key={post.id} post={post}/>
+                    <PostCard key={post.id} postItem={post}/>
                 )))
             }
             <BottomNav/>

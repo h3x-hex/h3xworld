@@ -80,7 +80,7 @@ export default function StepSelectPlan() {
       
       if(onboardingData.coverImage)
       {
-        coverUri = ((await storageClient.uploadFile(onboardingData.coverImage, { acl })).uri);
+        coverUri = (await storageClient.uploadFile(onboardingData.coverImage, { acl })).uri;
       }
   
       console.log(profileUri, coverUri);
@@ -132,11 +132,6 @@ export default function StepSelectPlan() {
             key: 'walletAddress',
             type: MetadataAttributeType.STRING, //5
             value: wallet.address,
-          },
-          {
-            key: 'walletPublicKey',
-            type: MetadataAttributeType.STRING, //6
-            value: wallet.publicKey,
           },
           {
             key: 'socialLinks',

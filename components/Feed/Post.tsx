@@ -46,7 +46,7 @@ const PostsFeed = ({address}: PostsFeedProps) => {
 
       const { items } = result.value;
       console.log('Returned items:', items.map(i => i.__typename));
-      const postArr = items.filter((item) => item.__typename === 'Post') as Post[];
+      const postArr = items.filter((item) => item.__typename === 'Post' && item.commentOn == null) as Post[];
       console.log(postArr)
       setPosts(postArr)
       setIsLoading(false);
@@ -59,7 +59,7 @@ const PostsFeed = ({address}: PostsFeedProps) => {
   return (
     <div className="bg-black min-h-screen text-white px-3">
       {posts && posts.map((post) => (
-        <PostCard key={post.id} post={post}/>
+        <PostCard key={post.id} postItem={post}/>
       ))}
     </div>
   )

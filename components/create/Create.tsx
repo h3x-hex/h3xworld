@@ -59,18 +59,30 @@ const Create = () => {
       icon: <span className="material-symbols-outlined text-gray-300">box_add</span>,
       link: 'h3xclusive/tier',
     },
+    {
+      title: 'Create a Portfolio Collection',
+      description: 'Highlight your best content in collections',
+      icon: <span className="material-symbols-outlined text-gray-300">dataset</span>,
+      link: 'portfolio',
+    },
+    {
+      title: 'Create a h3xclusive Tier',
+      description: 'h3xclusive tiers for your subscribers.',
+      icon: <span className="material-symbols-outlined text-gray-300">box_add</span>,
+      link: 'h3xclusive/tier',
+    }
 
   ]
 
   return (
     <div className='h-screen bg-stone-950 text-center flex flex-col'>
-      <div className='flex flex-row gap-8 text-center pt-8 mx-auto'>
+      <div className='flex flex-row gap-8 text-center pt-3 mx-auto'>
         <div className='pl-3 pt-2 absolute left-0'>
           <ArrowLeftIcon width={24} color='white' onClick={() => history.back()} className='cursor-pointer'/>
         </div>
         <h2 className="text-3xl sm:text-5xl font-semibold text-yellow-500 text-center">Create</h2>
       </div>
-      <div className="mt-6 px-6 grid grid-cols-2 gap-6 border-t border-gray-600 py-6 sm:h-[48rem] sm:w-[36rem] mx-auto">
+      <div className="mt-3 px-6 grid grid-cols-2 gap-6 border-t border-gray-600 py-6 sm:h-[48rem] sm:w-[36rem] mx-auto">
         {items.map((item, itemNo) => (
           <div key={itemNo} className="border-[1px] border-gray-600 py-3 rounded-lg cursor-pointer hover:border-yellow-500" onClick={() => router.push(`/create/${item.link}`)}>
             <div className='flex flex-col px-3'>

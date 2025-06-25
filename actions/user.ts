@@ -105,3 +105,51 @@ export const updateUsername = async (username: string, email: string) => {
       }
 
 }
+
+interface SocialLink {
+  platform: string
+  url: string
+}
+
+interface Profile {
+    name: string,
+    username: string;
+    profileImage: string;
+    coverImage: string;
+    bio: string;
+    socialLinks: SocialLink[];
+    plan: string;
+    location: string;
+    occupation: string;
+}
+
+export const editUser = async (email: string, profile: Profile) => {
+
+    try {
+
+        const existingUser = await getUserByEmail(email)
+
+
+        if(!existingUser) {
+            return { error: "User not found" }
+        }   
+        
+        const usernameExists = await prisma.user.update({
+          where: {
+            id: existingUser.id,
+          },
+          data: {
+            name: profile.name,
+            username: profile.username,
+          },
+        })
+        console.log('Update:', usernameExists);
+
+        return { success: 'User Updated'};
+        
+      } catch (error) {
+        console.log("Error:" , error)
+        return { error: error }
+      }
+
+}

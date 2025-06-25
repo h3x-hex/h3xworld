@@ -59,35 +59,33 @@ const H3xclusiveTiers = ({address}: PostsFeedProps) => {
       {
         isLoading ?
 
-        <div className='h-full pb-64 bg-stone-950 mx-auto flex items-center justify-center pt-32'><span className="loading loading-spinner text-warning text-lg"></span></div>
+          <div className='h-full pb-64 bg-stone-950 mx-auto flex items-center justify-center pt-32'><span className="loading loading-spinner text-warning text-lg"></span></div>
 
         :
 
-      
-
-        <div className="grid gap-6 sm:grid-cols-2 w-[90%] mx-auto">
-          {tierList.filter((tier) => tier.__typename === 'Post').map((tier) => (
-            tier.metadata.__typename === 'ImageMetadata' &&
-            <div key={tier.id} className="bg-stone-900 border border-yellow-500 rounded-lg p-5 shadow-md text-center">
-              <img
-                src={tier.metadata.image.item ? tier.metadata.image.item : '/defaultCover.png'}
-                alt={`${tier.metadata.title} thumbnail`}
-                className="w-full h-40 object-cover rounded-md mb-4 border border-yellow-400"
-              />
-              <h3 className="text-xl font-semibold text-white mb-1">{tier.metadata.title}</h3>
-              <p className="text-sm text-gray-400 mb-2">{tier.metadata.attributes[0].value}</p>
-              <p className="text-yellow-500 font-bold mb-3">${tier.metadata.attributes[1].value}/month</p>
-              <ul className="text-sm text-white list-disc pl-5 mb-4 space-y-1">
-                
-              </ul>
-              <button
-                className="w-full py-2 rounded-lg bg-yellow-500 text-black font-semibold hover:bg-yellow-400"
-              >
-                {'Unlock Tier'}
-              </button>
-            </div>
-          ))}
-        </div>
+          <div className="grid gap-6 sm:grid-cols-2 w-[90%] mx-auto">
+            {tierList.filter((tier) => tier.__typename === 'Post').map((tier) => (
+              tier.metadata.__typename === 'ImageMetadata' &&
+              <div key={tier.id} className="bg-stone-900 border border-yellow-500 rounded-lg p-5 shadow-md text-center">
+                <img
+                  src={tier.metadata.image.item ? tier.metadata.image.item : '/defaultCover.png'}
+                  alt={`${tier.metadata.title} thumbnail`}
+                  className="w-full h-40 object-cover rounded-md mb-4 border border-yellow-400"
+                />
+                <h3 className="text-xl font-semibold text-white mb-1">{tier.metadata.title}</h3>
+                <p className="text-sm text-gray-400 mb-2">{tier.metadata.attributes[0].value}</p>
+                <p className="text-yellow-500 font-bold mb-3">${tier.metadata.attributes[1].value}/month</p>
+                <ul className="text-sm text-white list-disc pl-5 mb-4 space-y-1">
+                  
+                </ul>
+                <button
+                  className="w-full py-2 rounded-lg bg-yellow-500 text-black font-semibold hover:bg-yellow-400"
+                >
+                  {'Unlock Tier'}
+                </button>
+              </div>
+            ))}
+          </div>
       }
     </div>
 

@@ -10,7 +10,7 @@ import { client } from '@/helper/lensClient'
 import { lensAccountOnly } from '@lens-chain/storage-client'
 import { storageClient } from '@/helper/storageClient'
 import { chains } from '@lens-chain/sdk/viem'
-import { feed, group, image, MediaImageMimeType, MetadataAttributeType, textOnly} from '@lens-protocol/metadata'
+import { feed, group, image, MediaImageMimeType, MetadataAttributeType, textOnly } from '@lens-protocol/metadata'
 import { handleOperationWith, signMessageWith } from '@lens-protocol/client/ethers'
 import { ethers} from 'ethers'
 import { Carousel } from 'react-responsive-carousel';
@@ -20,6 +20,8 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { useAtom } from 'jotai'
 import { userAtom } from '@/store/authState'
 import Modal from '@/components/Modal'
+import { uploadPostToLens } from '@/utils/uploadPostLens'
+import { uploadMediaToLens } from '@/utils/uploadMediaLens'
 
 interface PostAttachment {
   item: string,
@@ -66,7 +68,7 @@ export default function CreatePost() {
 
     const selectedFiles = Array.from(files)
     const oversized = selectedFiles.find((file) => file.size > maxSizeMB * 1024 * 1024)
-
+    
     if (oversized) {
       setUpgradePrompt(true)
       return
@@ -139,175 +141,25 @@ export default function CreatePost() {
       const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
       const signer = wallet.connect(provider);
 
-      const resumed = await client.resumeSession();
-          
-      if (resumed.isErr()) {
-        return console.error(resumed.error);
+      const filesURI: PostAttachment[] = await uploadMediaToLens(media);
+
+      if(selectedDest.includes('h3xclusive'))
+      {
+
+      }
+      if(selectedDest.includes('portfolio'))
+      {
+        uploadPostToLens(media.length, content, filesURI, 'portfolio', undefined, "0x48d5E01d21Ad51993c297935b3d618b99f7e2868", portfolioCollection, signer)
+      }
+      if(selectedDest.includes('club'))
+      {
+        uploadPostToLens(media.length, content, filesURI, 'club', undefined, clubSelection?.feed?.address, undefined, signer)
+      }
+      else 
+      {
+        uploadPostToLens(media.length, content, filesURI, 'post', undefined, "0x63c3579756B353D26876A9A5A6f563165C320b7f", undefined, signer)        
       }
       
-      // SessionClient: { ... }
-      const sessionClient = resumed.value;
-
-      if(media.length > 1)
-      {
-        const filesURI: PostAttachment[] = [];
-
-        for (let i = 0; i < media.length; i++) {
-          const uploadedFileUri = await storageClient.uploadFile(media[i].file!, { acl });
-          filesURI.push({ item: uploadedFileUri.gatewayUrl, type: MediaImageMimeType.WEBP });
-        }
-
-        const extraAttachments = filesURI.length > 1
-          ? filesURI.slice(1)
-          : [];
-
-        
-        
-        if(selectedDest.includes('h3xclusive'))
-        {
-
-        }
-        else {
-          const metadata = image({
-            title: content,
-            image: filesURI[0],
-            attachments: extraAttachments,
-          });
-          const { uri:contentUri } = await storageClient.uploadAsJson(metadata);         
-  
-          console.log(sessionClient);
-  
-          await post(sessionClient, { 
-            contentUri: uri(contentUri),
-            feed: evmAddress("0x63c3579756B353D26876A9A5A6f563165C320b7f"),
-          }).andThen(handleOperationWith(signer));
-  
-          if(selectedDest.includes('portfolio'))
-          {
-            const metadata = image({
-              title: content,
-              image: filesURI[0],
-              attachments: extraAttachments,
-              tags: [portfolioCollection]
-            });
-            const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-  
-            await post(sessionClient, { 
-              contentUri: uri(contentUri),
-              feed: evmAddress("0x48d5E01d21Ad51993c297935b3d618b99f7e2868"),
-            }).andThen(handleOperationWith(signer));
-          }
-  
-          if(selectedDest.includes('club'))
-            {
-              const metadata = image({
-                title: content,
-                image: filesURI[0],
-                attachments: extraAttachments,
-              });
-              const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-    
-              await post(sessionClient, { 
-                contentUri: uri(contentUri),
-                feed: evmAddress(clubSelection?.feed?.address),
-              }).andThen(handleOperationWith(signer));
-            }
-        }
-        
-        
-      }
-      if(media.length == 1)
-      {
-        const filesURI: PostAttachment[] = [];
-
-        for (let i = 0; i < media.length; i++) {
-          const uploadedFileUri = await storageClient.uploadFile(media[i].file!, { acl });
-          filesURI.push({ item: uploadedFileUri.gatewayUrl, type: MediaImageMimeType.WEBP });
-        }
-        
-        if(selectedDest.includes('h3xclusive'))
-        {
-
-        }
-        else {
-           
-          if(selectedDest.includes('portfolio'))
-          {
-            const metadata = image({
-              title: content,
-              image: filesURI[0],
-              tags: [portfolioCollection]
-            });
-            const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-  
-            await post(sessionClient, { 
-              contentUri: uri(contentUri),
-              feed: evmAddress("0x48d5E01d21Ad51993c297935b3d618b99f7e2868"),
-            }).andThen(handleOperationWith(signer));
-          }
-  
-          if(selectedDest.includes('club'))
-          {
-            const metadata = image({
-              title: content,
-              image: filesURI[0],
-            });
-            const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-
-            await post(sessionClient, { 
-              contentUri: uri(contentUri),
-              feed: evmAddress(clubSelection?.feed?.address),
-            }).andThen(handleOperationWith(signer));
-          }
-          
-          else
-          {
-            const metadata = image({
-              title: content,
-              image: filesURI[0],
-            });
-            const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-
-            const result = await post(sessionClient, { 
-              contentUri: uri(contentUri),
-              feed: evmAddress("0x63c3579756B353D26876A9A5A6f563165C320b7f"),
-            }).andThen(handleOperationWith(signer));
-
-            console.log(result)
-          }
-        }
-      } 
-      else
-      {
-        if(selectedDest.includes('portfolio'))
-        {
-          //Throw error portfolio needs to have images
-        }
-        if(selectedDest.includes('club'))
-        {
-          const metadata = textOnly({
-            content: content,
-          });
-          const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-
-          await post(sessionClient, { 
-            contentUri: uri(contentUri),
-            feed: evmAddress(clubSelection?.feed?.address),
-          }).andThen(handleOperationWith(signer));
-        }
-        else
-        {
-          const metadata = textOnly({
-            content: content,
-          });
-          const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-
-          await post(sessionClient, { 
-            contentUri: uri(contentUri),
-            feed: evmAddress(clubSelection?.feed?.address),
-          }).andThen(handleOperationWith(signer));
-        }
-      }
       router.push(`/${user.username}`)
       setIsLoading(false);
     } catch (error) {
@@ -341,33 +193,8 @@ export default function CreatePost() {
 
     const uploadedFileUri = await storageClient.uploadFile(thumbnailFile, { acl });
 
-    const metadata = image({
-      title: collectionName,
-      image: {
-        type: MediaImageMimeType.WEBP,
-        item: uploadedFileUri.gatewayUrl
-      },
-    });
-    const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-    
-    const resumed = await client.resumeSession();
-      
-    if (resumed.isErr()) {
-      return console.error(resumed.error);
-    }
-    
-    // SessionClient: { ... }
-    const sessionClient = resumed.value;
+    uploadPostToLens(1, collectionName, [{type: MediaImageMimeType.WEBP, item: uploadedFileUri.gatewayUrl}], 'portfolioCollection', undefined, "0xf7B7F7Faa314d4496bc7EBF2884A03802cEFF7a1", undefined, signer)
 
-    console.log(sessionClient);
-
-    const result = await post(sessionClient, { 
-      contentUri: uri(contentUri),
-      feed: evmAddress("0xf7B7F7Faa314d4496bc7EBF2884A03802cEFF7a1"),
-    }).andThen(handleOperationWith(signer));
-
-    console.log(result);
-    
   }
 
   const createClub = async (clubName: string, clubDescription: string, thumbnailFile: File): Promise<void> => {

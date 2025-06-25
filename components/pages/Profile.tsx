@@ -25,6 +25,8 @@ import ConnectionsModal from '../profile/ConnectionsModal'
 import { userAtom } from '@/store/authState'
 import { useAtom } from 'jotai'
 import EditProfileModal from '../profile/EditProfileModal'
+import TippingModal from '../modals/TippingModal'
+import MessageOptionModal from '../modals/MessageOptionModal'
 
 interface SocialLink {
   platform: string;
@@ -59,8 +61,11 @@ const Profile = () => {
     address: '',
   });
 
-  const tabs = ['Home', 'Posts', 'Portfolio', 'h3xclusive', 'Shop', 'Links', 'Bookings', 'Events', 'Clubs', 'About']
+  const tabs = ['Home', 'Posts', 'Portfolio', 'Shop', 'Gigs', 'h3xclusive', 'Links', 'Clubs', 'About']
   const tabRefs = useRef<Record<string, MutableRefObject<HTMLButtonElement | null>>>({})
+
+  const [isTippingModalOpen, setIsTippingModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false)
 
   const searchParams = useSearchParams()
   const defaultTab = searchParams.get('tab') || 'posts'
@@ -83,6 +88,22 @@ const Profile = () => {
 
   const pathname = usePathname();
   const username = pathname.split('/')[1];
+
+  
+  const handleTip = (amount: number) => {
+    console.log(`Tipped: ${amount}`)
+    // You can integrate your tipping logic here
+  }
+
+  
+  const handleMessageOption = (option: "options" | "dm" | "colab") => {
+    setIsMessageModalOpen(false)
+    if (option === "dm") {
+      router.push(`/dm/${profile.username}`)
+    } else {
+      router.push(`/colab/${profile.username}`)
+    }
+  }
 
   useEffect(() => {
 
@@ -271,8 +292,8 @@ const Profile = () => {
                   <button className={`btn ${following ? 'btn-outline bg-transparent border-yellow-500 shadow-none w-[33%] rounded-full text-white' : 'bg-yellow-500 text-black w-[33%] rounded-full border-yellow-500 shadow-none font-semibold'}`} onClick={() => followUser()}>{following? <span>Unfollow</span> : <span>Follow</span>}</button>
                   <button className={`btn ${subscribe ? 'btn-outline bg-transparent border-yellow-500 shadow-none w-[33%] rounded-full text-white' : 'bg-yellow-500 text-black w-[33%] rounded-full border-yellow-500 shadow-none font-semibold'}`} onClick={() => subscribeToUser()}>{subscribe ? <span>Unsubscribe</span> : <span>Subscribe</span>}</button>
                   <div className='flex flex-row w-[33%] gap-5 pl-2'>
-                    <ChatBubbleOvalLeftEllipsisIcon color='white' width={48} className='size-10 cursor-pointer'/>
-                    <CurrencyDollarIcon color='white' width={48} className='size-10 cursor-pointer'/>
+                    <ChatBubbleOvalLeftEllipsisIcon color='white' width={48} className='size-10 cursor-pointer' onClick={() => setIsMessageModalOpen(true)}/>
+                    <CurrencyDollarIcon color='white' width={48} className='size-10 cursor-pointer' onClick={() => setIsTippingModalOpen(true)}/>
                   </div>
                 </div>
               }
@@ -339,7 +360,7 @@ const Profile = () => {
                     
                     :
 
-                    activeTab === 'bookings' ?
+                    activeTab === 'gigs' ?
 
                     <div className='pt-8'>
                       <BookingTab address={profile.address}/>
@@ -369,6 +390,15 @@ const Profile = () => {
             </div>
             <ConnectionsModal isOpen={modalOpen} onClose={() => setModalOpen(false)} initialTab={initialConnectionTab}/>
             <BottomNav/>
+            <MessageOptionModal
+              isOpen={isMessageModalOpen}
+              onClose={() => setIsMessageModalOpen(false)}
+            />
+            <TippingModal
+              isOpen={isTippingModalOpen}
+              onClose={() => setIsTippingModalOpen(false)}
+              onTip={handleTip}
+            />
         </MediaQuery>
         <MediaQuery minWidth={551} maxWidth={99999}>
             <Sidebar/>
@@ -408,8 +438,8 @@ const Profile = () => {
                   <button className='btn btn-outline hover:bg-yellow-500 hover:text-black border-yellow-500 shadow-none w-[33%] rounded-full text-white'>Follow</button>
                   <button className='btn btn-outline hover:bg-yellow-500 hover:text-black border-yellow-500 shadow-none w-[33%] rounded-full text-white'>Subscribe</button>
                   <div className='flex flex-row w-[33%] gap-5 pl-2'>
-                    <ChatBubbleOvalLeftEllipsisIcon color='white' width={48} className='size-10 cursor-pointer hover:text-yellow-500'/>
-                    <CurrencyDollarIcon color='white' width={48} className='size-10 cursor-pointer hover:text-yellow-500'/>
+                    <ChatBubbleOvalLeftEllipsisIcon color='white' width={48} className='size-10 cursor-pointer hover:text-yellow-500' onClick={() => setIsMessageModalOpen(true)}/>
+                    <CurrencyDollarIcon color='white' width={48} className='size-10 cursor-pointer hover:text-yellow-500' onClick={() => setIsTippingModalOpen(true)}/>
                   </div>
                 </div>
                 <div className="overflow-x-auto w-full px-2 mt-3 pt-3 pb-1 border-t-[1px] border-gray-600">
@@ -446,6 +476,15 @@ const Profile = () => {
               </div>
             </div>
             <RightSidebar/>
+            <MessageOptionModal
+              isOpen={isMessageModalOpen}
+              onClose={() => setIsMessageModalOpen(false)}
+            />
+            <TippingModal
+              isOpen={isTippingModalOpen}
+              onClose={() => setIsTippingModalOpen(false)}
+              onTip={handleTip}
+            />
         </MediaQuery>
 
         {isModalOpen && (

@@ -12,6 +12,14 @@ import { useRouter } from 'next/navigation'
 import { client } from '@/helper/lensClient'
 import { ethers } from 'ethers'
 import { signMessageWith } from '@lens-protocol/client/ethers'
+import { fetchAccount } from '@lens-protocol/client/actions'
+import { evmAddress } from '@lens-protocol/client'
+
+
+interface SocialLink {
+  platform: string;
+  url: string;
+}
 
 const LoginForm = () => {
 
@@ -95,8 +103,24 @@ const LoginForm = () => {
       // SessionClient: { ... }
       const sessionClient = authenticated.value;
 
-      console.log(sessionClient)
+      console.log(sessionClient);
 
+      const result = await fetchAccount(client, {
+        username: {
+          localName: user.username!,
+          namespace: evmAddress("0x0c978F29b462762A1b64e10E0c7052353E743a2e"), // the Username namespace address
+        },
+      });
+      
+      if (result.isErr()) {
+        return console.error(result.error);
+      }
+      
+      const account = result.value;
+
+      const socialLinksArray: SocialLink[] = Object.entries(JSON.parse(account?.metadata?.attributes[7].value!)).map(([platform, url]) => ({ platform, url } as SocialLink));
+        
+      setUser({...user, bio: account?.metadata?.bio!, dob: account?.metadata?.attributes[1].value , location: account?.metadata?.attributes[2].value, occupation: account?.metadata?.attributes[3].value, socialLinks: socialLinksArray, profileImage: account?.metadata?.picture, coverImage: account?.metadata?.coverPicture})
       setSuccess("User Logged In");
       router.push('/home');
       console.log(res.success);

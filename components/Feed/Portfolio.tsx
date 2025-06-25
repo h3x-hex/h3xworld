@@ -51,7 +51,7 @@ const PortfolioGrid = ({address}: PostsFeedProps) => {
   return (
     <>
     <div className="bg-black min-h-screen text-white p-4">
-      <h2 className="text-2xl font-bold text-yellow-500 mb-4">My Portfolio</h2>
+      <h2 className="text-2xl font-bold text-yellow-500 mb-4">My Portfolio Collections</h2>
       {
         isLoading ?
 

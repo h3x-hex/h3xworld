@@ -1,6 +1,6 @@
 import React from 'react'
-import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline'
-import { ChatBubbleOvalLeftEllipsisIcon as ChatSolidIcon } from '@heroicons/react/24/solid'
+import { ChatBubbleOvalLeftEllipsisIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleOvalLeftEllipsisIcon as ChatSolidIcon, Cog6ToothIcon as CogSolidIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import useNavigation from '@/hooks/useNavigation'
@@ -11,6 +11,8 @@ const Navbar = () => {
   
   const {
       isChatActive,
+      isSettingsActive,
+      isProfileActive
   } = useNavigation();
 
   return (
@@ -29,7 +31,7 @@ const Navbar = () => {
         </div>
         <div className="navbar-end">
           <div role="button" className="bg-transparent border-none shadow-none pr-3">
-            <div className="w-10 rounded-full font-semibold">
+            <div className="w-8 rounded-full font-semibold">
               {
                 !isChatActive ?
 
@@ -43,6 +45,27 @@ const Navbar = () => {
               
             </div>
           </div>
+          {
+            isProfileActive ?
+
+            <div role="button" className="bg-transparent border-none shadow-none pr-3">
+              <div className="w-8 rounded-full font-semibold">
+                {
+                  !isSettingsActive ?
+
+                  <Cog6ToothIcon color='white' onClick={() => router.push('/settings')}/>
+
+                  :
+
+                  <CogSolidIcon color='#F0B100'/>
+
+                }
+                
+              </div>
+            </div>
+            :
+            <></>
+          }
         </div>
       </div>
 
