@@ -1,4 +1,4 @@
-'use client'
+/*'use client'
 
 import { InformationCircleIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import React, { useEffect, useRef, useState } from 'react'
@@ -714,5 +714,5 @@ export default function CreatePost() {
 
     </div>
   )
-}
+}*/
 

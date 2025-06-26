@@ -93,6 +93,7 @@ const Create: React.FC = () => {
       role="button"
       tabIndex={0}
       aria-label={`${item.title}: ${item.description}`}
+      key={index}
     >
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center justify-center w-1/5 mx-auto my-auto mb-2">

@@ -7,7 +7,6 @@ import { Post, postId, uri } from "@lens-protocol/client"
 import { Carousel } from "react-responsive-carousel"
 import moment from 'moment'
 import { lensAccountOnly } from "@lens-chain/storage-client"
-import { ethers } from "ethers"
 import { chains } from "@lens-chain/sdk/viem"
 import { storageClient } from "@/helper/storageClient"
 import { image, MediaImageMimeType, textOnly } from "@lens-protocol/metadata"
@@ -368,17 +367,37 @@ const QuoteModal: React.FC<QuoteModalProps> = ({
               <GifIcon className="h-5 w-5 cursor-pointer hover:text-white" color={goldColor} onClick={() => setShowGifPicker(true)}/>
               <FaceSmileIcon className="h-5 w-5 cursor-pointer hover:text-white" color={goldColor} onClick={() => setShowPicker(!showPicker)}/>
             </div>
-            <button
-              onClick={handleSubmit}
-              disabled={!quote.trim()}
-              className={`px-4 py-2 rounded-full font-semibold transition ${
-                quote.trim()
-                  ? "bg-yellow-500 text-black hover:bg-yellow-600"
-                  : "bg-yellow-500/50 text-black cursor-not-allowed"
-              }`}
-            >
-              Post
-            </button>
+            {
+              isLoading ?
+
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={!quote.trim()}
+                className={`px-4 py-2 rounded-full font-semibold transition ${
+                  quote.trim()
+                    ? "bg-yellow-500 text-black hover:bg-yellow-600"
+                    : "bg-yellow-500/50 text-black cursor-not-allowed"
+                }`}
+              >
+                <span className="loading loading-spinner"></span> Posting Quote...
+              </button>
+              
+              :
+              
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={!quote.trim()}
+                className={`px-4 py-2 rounded-full font-semibold transition ${
+                  quote.trim()
+                    ? "bg-yellow-500 text-black hover:bg-yellow-600"
+                    : "bg-yellow-500/50 text-black cursor-not-allowed"
+                }`}
+              >
+                Post Quote
+              </button>
+            }
           </div>
           {showGifPicker && (
             <GifPicker

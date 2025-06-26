@@ -95,8 +95,12 @@ export default function CreateAndBookPage() {
     })
   }, [currentSlide])
 
+  const handleBackClick = () => {
+    gigType ? setGigType(null) : router.back()
+  }
+
   const handleSubmit = async () => {
-    if (!gigType || !title || !description || price <= 0) return alert('Please fill in all required fields.');
+    /*if (!gigType || !title || !description || price <= 0) return alert('Please fill in all required fields.');
 
     let imageUrl = '';
     if (media.length > 0) {
@@ -104,7 +108,7 @@ export default function CreateAndBookPage() {
       imageUrl = uploaded.gatewayUrl;
     }
 
-    /*const baseMetadata: any = { title, description, price, image: imageUrl, gigType };
+    const baseMetadata: any = { title, description, price, image: imageUrl, gigType };
 
     if (gigType === 'meeting') {
       if (!meetingDate || meetingTimes.length === 0 || !meetingLocation || (meetingLocation === 'physical' && !physicalAddress)) {
@@ -131,7 +135,7 @@ export default function CreateAndBookPage() {
 
   return (
     <div className='px-4 pb-24 sm:w-[36rem] mx-auto bg-stone-950 min-h-screen text-white'>
-      <ArrowLeftIcon width={24} className='absolute top-8 left-5 cursor-pointer' onClick={() => {gigType ? setGigType(null) : router.back()}} />
+      <ArrowLeftIcon width={24} className='absolute top-8 left-5 cursor-pointer' onClick={() => handleBackClick()} />
       <h1 className='text-3xl text-yellow-500 text-center pt-6'>{gigType === 'meeting' ? 'Create Meeting' : gigType === 'freelance' ? 'Create Freelance Service' : 'Create Gig'}</h1>
 
       {!gigType ? (
@@ -273,17 +277,4 @@ export default function CreateAndBookPage() {
       )}
     </div>
   )
-}
-
-function usePreviewUrls(files: File[]) {
-  const [previews, setPreviews] = useState<{ file: File; url: string }[]>([]);
-
-  useEffect(() => {
-    const newPreviews = files.map(file => ({ file, url: URL.createObjectURL(file) }))
-    setPreviews(newPreviews)
-
-    return () => newPreviews.forEach(p => URL.revokeObjectURL(p.url))
-  }, [files])
-
-  return previews;
 }

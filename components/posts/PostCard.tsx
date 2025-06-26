@@ -25,7 +25,6 @@ import { handleOperationWith } from '@lens-protocol/client/ethers'
 import { ethers } from 'ethers'
 import ImageModal from './ImageModal'
 import QuoteModal from '../modals/QuoteModal'
-import { MediaImageMimeType } from '@lens-protocol/metadata'
 import { goldColor, greyColor, whiteColor } from '@/constants/colors'
 
 interface PostCardProps {

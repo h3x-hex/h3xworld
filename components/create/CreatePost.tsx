@@ -1,6 +1,6 @@
 'use client'
 
-import { InformationCircleIcon, PhotoIcon, GifIcon } from '@heroicons/react/24/outline'
+import { InformationCircleIcon, PhotoIcon, GifIcon, FaceSmileIcon } from '@heroicons/react/24/outline'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/navigation'
@@ -445,6 +445,7 @@ export default function CreatePost() {
           <input ref={inputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => handleFileChange(e)} className='hidden'/>
           <PhotoIcon className='cursor-pointer' width={36} color={goldColor} onClick={() => inputRef.current?.click()}/>
           <GifIcon className="cursor-pointer" width={36} color={goldColor} onClick={() => setShowGifPicker(true)}/>
+          <FaceSmileIcon className="h-5 w-5 cursor-pointer hover:text-white" color={goldColor} onClick={() => setShowPicker(!showPicker)}/>
         </div>
 
         {/* Upgrade Prompt */}

@@ -45,7 +45,7 @@ const Comments: React.FC<CommentsProps> = ( { postItemId } ) => {
             { comments &&
 
                 (comments.map((comment) => (
-                    <CommentCard comment={comment}/>
+                    <CommentCard key={comment.id} comment={comment}/>
                 )))
             }
         </div>
