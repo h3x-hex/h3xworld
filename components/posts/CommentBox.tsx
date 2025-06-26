@@ -13,7 +13,6 @@ import GifPicker from './GifPicker';
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
 import { goldColor } from '@/constants/colors';
-import { useRouter } from 'next/navigation';
 import { MAX_FILE_SIZE_MB } from '@/constants/constants'
 import TippingModal from '../modals/TippingModal';
 

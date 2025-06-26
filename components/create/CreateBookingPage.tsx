@@ -7,7 +7,6 @@
 import { PhotoIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { storageClient } from '@/helper/storageClient'
 import { Carousel } from 'react-responsive-carousel'
 import { TrashIcon } from '@heroicons/react/24/solid'
 
@@ -96,7 +95,10 @@ export default function CreateAndBookPage() {
   }, [currentSlide])
 
   const handleBackClick = () => {
-    gigType ? setGigType(null) : router.back()
+    if(gigType)
+      setGigType(null)
+    else
+      router.back()
   }
 
   const handleSubmit = async () => {
