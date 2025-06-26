@@ -112,9 +112,6 @@ const QuoteModal: React.FC<QuoteModalProps> = ({
       ? moment(quotedPost.timestamp).fromNow()
       : 'just now'
 
-  const addEmoji = (emoji: any) => {
-    setQuote(prev => prev + emoji.native)
-  }
   // close on <Esc> or click outside
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()

@@ -117,10 +117,6 @@ export default function CreatePost() {
     setUpgradePrompt(false)
   }, [])
 
-  const addEmoji = (emoji: any) => {
-    setContent(prev => prev + emoji.native)
-  }
-
   // Optimized destination handling
   const handleDestinationChange = useCallback((dest: string) => {
     setSelectedDest(prev => {
