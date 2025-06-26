@@ -90,7 +90,7 @@ const HomeFeed = () => {
 
                 <div className="flex flex-col gap-6">
                     {posts.map((post) => (
-                        <PostCard key={post.id} post={post} />
+                        <PostCard key={post.id} postItem={post} />
                     ))}
                 </div>
             </div>
