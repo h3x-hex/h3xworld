@@ -19,7 +19,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { useAtom } from 'jotai'
 import { userAtom } from '@/store/authState'
 import GifPicker from "../posts/GifPicker"
-import { Picker } from 'emoji-mart'
+import EmojiPicker from 'emoji-picker-react'
 import { MAX_FILE_SIZE_MB, MAX_FILE_SIZE_BYTES } from '@/constants/constants'
 import { goldColor } from "@/constants/colors"
 import Modal from '@/components/Modal'
@@ -631,12 +631,7 @@ export default function CreatePost() {
 
         {showPicker && (
           <div className="absolute z-50 mt-2">
-            <Picker
-              onSelect={addEmoji}
-              theme="dark"
-              showPreview={false}
-              showSkinTones={false}
-            />
+            <EmojiPicker onEmojiClick={(emojiObject) => setContent(prev => prev + emojiObject.emoji)} />
           </div>
         )}
 

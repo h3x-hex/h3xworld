@@ -18,8 +18,7 @@ import { client } from "@/helper/lensClient"
 import { goldColor } from "@/constants/colors"
 import { MAX_FILE_SIZE_MB } from '@/constants/constants'
 import GifPicker from "../posts/GifPicker"
-import { Picker } from 'emoji-mart'
-import 'emoji-mart/css/emoji-mart.css'
+import EmojiPicker from 'emoji-picker-react'
 
 
 interface PostAttachment {
@@ -409,12 +408,7 @@ const QuoteModal: React.FC<QuoteModalProps> = ({
 
           {showPicker && (
             <div className="absolute z-50 mt-2">
-              <Picker
-                onSelect={addEmoji}
-                theme="dark"
-                showPreview={false}
-                showSkinTones={false}
-              />
+              <EmojiPicker onEmojiClick={(emojiObject) => setQuote(prev => prev + emojiObject.emoji)} />
             </div>
           )}
         </div>

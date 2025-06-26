@@ -10,8 +10,7 @@ import {
 import { useAtom } from 'jotai';
 import { userAtom } from '@/store/authState';
 import GifPicker from './GifPicker';
-import { Picker } from 'emoji-mart'
-import 'emoji-mart/css/emoji-mart.css'
+import EmojiPicker from 'emoji-picker-react'
 import { goldColor } from '@/constants/colors';
 import { MAX_FILE_SIZE_MB } from '@/constants/constants'
 import TippingModal from '../modals/TippingModal';
@@ -48,10 +47,6 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onPost }) => {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
   };
-
-  const addEmoji = (emoji: any) => {
-    setContent(prev => prev + emoji.native)
-  }
 
   const handlePost = () => {
     console.log('first')
@@ -138,12 +133,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ onPost }) => {
 
         {showPicker && (
           <div className="absolute z-50 mt-2">
-            <Picker
-              onSelect={addEmoji}
-              theme="dark"
-              showPreview={false}
-              showSkinTones={false}
-            />
+            <EmojiPicker onEmojiClick={(emojiObject) => setContent(prev => prev + emojiObject.emoji)} />
           </div>
         )}
 
