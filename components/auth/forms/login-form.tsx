@@ -122,9 +122,9 @@ const LoginForm = () => {
         
       setUser({...user, bio: account?.metadata?.bio!, dob: account?.metadata?.attributes[1].value , location: account?.metadata?.attributes[2].value, occupation: account?.metadata?.attributes[3].value, socialLinks: socialLinksArray, profileImage: account?.metadata?.picture, coverImage: account?.metadata?.coverPicture})
       setSuccess("User Logged In");
-      router.push('/home');
       console.log(res.success);
       setLoading(false);
+      router.push('/home');
     });
   };
 
