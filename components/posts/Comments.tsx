@@ -1,8 +1,6 @@
 'use client'
 
-import { userAtom } from '@/store/authState'
 import { fetchPostReferences } from '@lens-protocol/client/actions'
-import { useAtom } from 'jotai'
 import { Post, AnyPost, postId, PostReferenceType, PostId } from "@lens-protocol/client";
 import React, { useEffect, useState } from "react";
 import { client } from '@/helper/lensClient';
@@ -31,7 +29,7 @@ const Comments: React.FC<CommentsProps> = ( { postItemId } ) => {
             }
 
             
-            const { items, pageInfo } = result.value;
+            const { items } = result.value;
             const postArr = items.filter((item: AnyPost) => item.__typename === 'Post') as Post[];
 
             setComments(postArr);

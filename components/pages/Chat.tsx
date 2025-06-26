@@ -2,7 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-import Navbar from '../nav/Navbar';
 import BottomNav from '../nav/BottomNav';
 import { useRouter } from 'next/navigation';
 import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'

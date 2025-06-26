@@ -47,7 +47,7 @@ const SettingsPage: React.FC = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const { name, value, checked, type } = e.target
+    const { name, value, checked } = e.target
     if (name === "username" || name === "email") {
       setSettings(prev => ({ ...prev, [name]: value }))
     } else if (name === "currentPassword" || name === "newPassword") {

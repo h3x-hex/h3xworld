@@ -52,9 +52,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
       occupation: user.occupation!,
   });
 
-  const [newPlatform, setNewPlatform] = useState('')
-  const [newUrl, setNewUrl] = useState('')
-
   const [profileImage, setProfileImage] = useState<File|null>(null);
   const [coverImage, setCoverImage] = useState<File|null>(null);
 
@@ -152,7 +149,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ onClose, onSave }) 
     const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
     const signer = wallet.connect(provider);
     
-    const result = await setAccountMetadata(sessionClient, {
+    await setAccountMetadata(sessionClient, {
       metadataUri: uri(AccountMetadata),
     }).andThen(handleOperationWith(signer));
 

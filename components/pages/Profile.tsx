@@ -96,14 +96,14 @@ const Profile = () => {
   }
 
   
-  const handleMessageOption = (option: "options" | "dm" | "colab") => {
+  /*const handleMessageOption = (option: "options" | "dm" | "colab") => {
     setIsMessageModalOpen(false)
     if (option === "dm") {
       router.push(`/dm/${profile.username}`)
     } else {
       router.push(`/colab/${profile.username}`)
     }
-  }
+  }*/
 
   useEffect(() => {
 

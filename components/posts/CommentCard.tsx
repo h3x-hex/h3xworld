@@ -30,10 +30,9 @@ import { goldColor, greyColor, whiteColor } from '@/constants/colors'
 
 interface CommentCardProps {
   comment: Post;
-  onReply?: (commentId: string) => void;
 }
 
-const CommentCard: React.FC<CommentCardProps> = ({ comment, onReply }) => {
+const CommentCard: React.FC<CommentCardProps> = ({ comment }) => {
 
   const timestamp = comment.timestamp
       ? moment(comment.timestamp).fromNow()
@@ -125,11 +124,11 @@ const CommentCard: React.FC<CommentCardProps> = ({ comment, onReply }) => {
     setTimeout(() => setMenuOpen(false), 300)
   }
 
-  const handleQuote = (quoteText: string) => {
+  /*const handleQuote = (quoteText: string) => {
     console.log("Submitting quote:", quoteText)
     // send to backend...
     
-  }
+  }*/
 
   const handleCardClick = () => {
     if (justClosedModalRef.current) {

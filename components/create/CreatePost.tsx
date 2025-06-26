@@ -20,6 +20,7 @@ import { useAtom } from 'jotai'
 import { userAtom } from '@/store/authState'
 import GifPicker from "../posts/GifPicker"
 import { Picker } from 'emoji-mart'
+import { MAX_FILE_SIZE_MB, MAX_FILE_SIZE_BYTES } from '@/constants/constants'
 import { goldColor } from "@/constants/colors"
 import Modal from '@/components/Modal'
 import { uploadPostToLens } from '@/utils/uploadPostLens'
@@ -41,10 +42,6 @@ interface DestinationState {
   club: Group | null
   h3xclusive: string[]
 }
-
-// Constants
-const MAX_FILE_SIZE_MB = 8
-const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 const FEED_ADDRESSES = {
   portfolio: "0x48d5E01d21Ad51993c297935b3d618b99f7e2868",

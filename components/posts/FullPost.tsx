@@ -4,11 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import moment from "moment";
 import { client } from "@/helper/lensClient";
-import { addReaction, bookmarkPost, repost, undoBookmarkPost, undoReaction, post } from "@lens-protocol/client/actions";
-import { textOnly, MediaImageMimeType, image} from '@lens-protocol/metadata'
+import { addReaction, bookmarkPost, repost, undoBookmarkPost, undoReaction } from "@lens-protocol/client/actions";
+import { MediaImageMimeType } from '@lens-protocol/metadata'
 import { fetchPost } from "@lens-protocol/client/actions";
-import { Post, postId, PostReactionType, uri } from "@lens-protocol/client";
-import { storageClient } from '@/helper/storageClient';
+import { Post, postId, PostReactionType } from "@lens-protocol/client";
 import {
   ArrowPathRoundedSquareIcon,
   BookmarkIcon,

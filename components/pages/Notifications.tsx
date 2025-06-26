@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { evmAddress } from "@lens-protocol/client";
 import { fetchNotifications } from "@lens-protocol/client/actions";
 
 import { client } from "../../helper/lensClient";
@@ -24,7 +23,7 @@ const Notifications = () => {
       }
 
       // items: Array<Notification>
-      const { items, pageInfo } = result.value;
+      const { items } = result.value;
       console.log(items);
 
     }

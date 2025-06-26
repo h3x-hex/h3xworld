@@ -17,6 +17,10 @@ interface MediaFile {
   type: string
 }
 
+// Constants
+const MAX_FILE_SIZE_MB = 8
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
 export default function CreateAndBookPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -27,9 +31,8 @@ export default function CreateAndBookPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState<number>(0);
-  const [media, setMedia] = useState<MediaFile[]>([])
-  const [files, setFiles] = useState<File[]>([]);
-  const previews = usePreviewUrls(files);
+  const [media, setMedia] = useState<MediaFile[]>([]);
+  const [upgradePrompt, setUpgradePrompt] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Meeting specific
@@ -40,10 +43,27 @@ export default function CreateAndBookPage() {
   const [meetingLocation, setMeetingLocation] = useState<'google_meet' | 'physical' | ''>('');
   const [physicalAddress, setPhysicalAddress] = useState('');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || []).slice(0, 1);
-    setFiles(selectedFiles);
-  };
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+
+    const selectedFiles = Array.from(files)
+    const oversizedFiles = selectedFiles.filter(file => file.size > MAX_FILE_SIZE_BYTES)
+    
+    if (oversizedFiles.length > 0) {
+      setUpgradePrompt(true)
+      return
+    }
+
+    const newMedia = selectedFiles.map(file => ({
+      file,
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith('video') ? 'video' : 'image'
+    }))
+
+    setMedia(prev => [...prev, ...newMedia])
+    setUpgradePrompt(false)
+  }, [])
 
   const handleAddMeetingTime = () => {
     if (meetingTimeInput && !meetingTimes.includes(meetingTimeInput)) {
@@ -79,12 +99,12 @@ export default function CreateAndBookPage() {
     if (!gigType || !title || !description || price <= 0) return alert('Please fill in all required fields.');
 
     let imageUrl = '';
-    if (files.length > 0) {
-      const uploaded = await storageClient.uploadFile(files[0]);
+    if (media.length > 0) {
+      const uploaded = await storageClient.uploadFile(media[0].file!);
       imageUrl = uploaded.gatewayUrl;
     }
 
-    const baseMetadata: any = { title, description, price, image: imageUrl, gigType };
+    /*const baseMetadata: any = { title, description, price, image: imageUrl, gigType };
 
     if (gigType === 'meeting') {
       if (!meetingDate || meetingTimes.length === 0 || !meetingLocation || (meetingLocation === 'physical' && !physicalAddress)) {
@@ -99,8 +119,15 @@ export default function CreateAndBookPage() {
 
     const { uri } = await storageClient.uploadAsJson(baseMetadata);
     console.log('Gig created at URI:', uri);
-    router.push('/gigs');
+    router.push('/gigs');*/
   };
+
+  // Cleanup effect for media URLs
+  useEffect(() => {
+    return () => {
+      media.forEach(({ url }) => URL.revokeObjectURL(url))
+    }
+  }, [])
 
   return (
     <div className='px-4 pb-24 sm:w-[36rem] mx-auto bg-stone-950 min-h-screen text-white'>
@@ -177,21 +204,50 @@ export default function CreateAndBookPage() {
 
           <fieldset>
             <label>Upload Image</label>
-            {previews.length > 0 && (
-              <Carousel showThumbs={false} showStatus={false} selectedItem={currentSlide} onChange={setCurrentSlide} className='mb-4'>
-                {previews.map(({ url }, idx) => (
-                  <div key={url} className='relative h-64'>
-                    <img src={url} className='h-64 object-cover w-full' />
-                    <button
-                      onClick={() => removeFile(idx)}
-                      className="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 text-white hover:bg-opacity-90 transition-opacity"
-                      aria-label="Remove media"
-                    >
-                      <TrashIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-              </Carousel>
+            {/* Media Preview */}
+            {media.length > 0 && (
+              <div className="mb-6">
+                <Carousel
+                  selectedItem={currentSlide}
+                  onChange={setCurrentSlide}
+                  showThumbs={false}
+                  showStatus={false}
+                  infiniteLoop={media.length > 1}
+                  useKeyboardArrows
+                  dynamicHeight={false}
+                  className="rounded-lg overflow-hidden border-2 border-gray-600"
+                >
+                  {media.map(({ file, url }, idx) => (
+                    <div key={url} className="relative h-64 sm:h-96">
+                      {file && file.type.startsWith('video') ? (
+                        <video 
+                          src={url} 
+                          controls 
+                          className="w-full h-full object-cover" 
+                          preload="metadata"
+                        />
+                      ) : (
+                        <img 
+                          src={url} 
+                          className="w-full h-full object-cover" 
+                          alt={`Preview ${idx + 1}`}
+                          loading="lazy"
+                        />
+                      )}
+                      <button
+                        onClick={() => removeFile(idx)}
+                        className="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 text-white hover:bg-opacity-90 transition-opacity"
+                        aria-label="Remove media"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </Carousel>
+                <div className="text-center text-sm text-gray-400 mt-2">
+                  {media.length > 1 && `${currentSlide + 1} of ${media.length}`}
+                </div>
+              </div>
             )}
             <div className='flex items-center gap-3'>
               <input ref={inputRef} type='file' accept='image/*' onChange={handleFileChange} className='hidden' />
@@ -199,6 +255,18 @@ export default function CreateAndBookPage() {
               <span>Upload an image</span>
             </div>
           </fieldset>
+
+          {/* Upgrade Prompt */}
+          {upgradePrompt && (
+            <div className="bg-yellow-900 text-yellow-100 p-4 rounded-lg mb-6">
+              <p className="font-semibold">File size limit exceeded</p>
+              <p className="text-sm">
+                One or more files exceed the {MAX_FILE_SIZE_MB}MB limit. 
+                <br />
+                <strong>Upgrade to h3xPro</strong> for larger file support.
+              </p>
+            </div>
+          )}
 
           <button onClick={handleSubmit} className='btn btn-warning bg-yellow-500 text-black w-full mt-6'>Create Gig</button>
         </div>

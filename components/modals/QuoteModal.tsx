@@ -17,6 +17,7 @@ import { userAtom } from "@/store/authState"
 import { useRouter } from "next/navigation"
 import { client } from "@/helper/lensClient"
 import { goldColor } from "@/constants/colors"
+import { MAX_FILE_SIZE_MB } from '@/constants/constants'
 import GifPicker from "../posts/GifPicker"
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
@@ -142,10 +143,6 @@ const QuoteModal: React.FC<QuoteModalProps> = ({
         '0x2a88fDB064A1aFE5A0Cabf19E176B24CdA2EE1F7',
         chains.testnet.id
       );
-
-      const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!);
-      const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
-      const signer = wallet.connect(provider);
 
       const resumed = await client.resumeSession();
           
@@ -291,6 +288,18 @@ const QuoteModal: React.FC<QuoteModalProps> = ({
               </div>
             ))}
           </Carousel>
+        )}
+
+        {/* Upgrade Prompt */}
+        {upgradePrompt && (
+          <div className="bg-yellow-900 text-yellow-100 p-4 rounded-lg mb-6">
+            <p className="font-semibold">File size limit exceeded</p>
+            <p className="text-sm">
+              One or more files exceed the {MAX_FILE_SIZE_MB}MB limit. 
+              <br />
+              <strong>Upgrade to h3xPro</strong> for larger file support.
+            </p>
+          </div>
         )}
 
         {/* Quoted Post Preview */}
