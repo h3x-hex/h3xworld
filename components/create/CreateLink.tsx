@@ -117,10 +117,19 @@ const CreateLink = () => {
   }
 
   return (
-    <div className='px-3 pb-96 pt-3 h-full sm:h-screen bg-stone-950 sm:w-[27rem] mx-auto'>
-      <ArrowLeftIcon width={24} color='white' onClick={() => router.push('/create')} className='absolute top-7 sm:left-8 sm:top-6'/>
-      <div className='h-12 border-b-2 border-gray-600 flex flex-row'>
-        <h1 className='pt-2 text-3xl text-yellow-500 mx-auto'>Create Link</h1>
+    <div className='max-w-xl mx-auto bg-black text-white p-6 rounded-xl min-h-screen'>
+      {/* Header */}
+      <div className="flex items-center mb-3 w-full border-b-2 border-gray-600">
+          <button
+          onClick={() => router.push('/create')}
+          className="btn-ghost bg-transparent border-none transition-colors"
+          aria-label="Go back"
+          >
+          <ArrowLeftIcon className="w-6 h-6 text-white" />
+          </button>
+          <div className='h-12 flex flex-row mx-auto w-full'>
+          <h1 className='text-3xl text-yellow-500 mx-auto pr-4'>Create Link</h1>
+          </div>
       </div>
 
       <fieldset className="fieldset">

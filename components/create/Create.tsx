@@ -1,107 +1,149 @@
 'use client'
 
-import React from 'react'
-import { ArrowLeftIcon} from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
+import React, { useCallback, useMemo } from 'react'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
+import { useRouter } from 'next/navigation'
 
+interface CreateItem {
+  title: string
+  description: string
+  icon: string
+  link: string
+}
 
-const Create = () => {
+const Create: React.FC = () => {
+  const router = useRouter()
 
-  const router = useRouter();
-
-  const items = [
-
+  // Memoize items array to prevent unnecessary re-renders
+  const items: CreateItem[] = useMemo(() => [
     {
       title: 'Create a Post',
       description: 'Share thoughts, ideas, or content with your audience.',
-      icon: <span className="material-symbols-outlined text-gray-300">post_add</span>,
+      icon: 'post_add',
       link: 'post',
     },
     {
       title: 'Create a Club',
       description: 'Create a club and build your community.',
-      icon: <span className="material-symbols-outlined text-gray-300">groups</span>,
+      icon: 'groups',
       link: 'club',
     },
     {
       title: 'Create a Link',
       description: 'Share an external resource with your followers.',
-      icon: <span className="material-symbols-outlined text-gray-300">link</span>,
+      icon: 'link',
       link: 'link',
     },
     {
-      title: 'Create a Booking',
-      description: 'Offer time slots to connect and collaborate.',
-      icon: <span className="material-symbols-outlined text-gray-300">calendar_month</span>,
-      link: 'booking',
+      title: 'Create a Gig',
+      description: 'Offer your services and skills to connect with clients.',
+      icon: 'business_center',
+      link: 'gig',
     },
     {
       title: 'Create a Shop Product',
-      description: 'Sell Digitals products or add products to your shop.',
-      icon: <span className="material-symbols-outlined text-gray-300">shopping_bag</span>,
+      description: 'Sell digital products or add products to your shop.',
+      icon: 'shopping_bag',
       link: 'product',
     },
     {
       title: 'Create a Shop Category',
       description: 'Organize your shop products by category.',
-      icon: <span className="material-symbols-outlined text-gray-300">sell</span>,
+      icon: 'sell',
       link: 'category',
     },
     {
       title: 'Create a Portfolio Collection',
-      description: 'Highlight your best content in collections',
-      icon: <span className="material-symbols-outlined text-gray-300">dataset</span>,
+      description: 'Highlight your best content in collections.',
+      icon: 'dataset',
       link: 'portfolio',
     },
     {
       title: 'Create a h3xclusive Tier',
       description: 'h3xclusive tiers for your subscribers.',
-      icon: <span className="material-symbols-outlined text-gray-300">box_add</span>,
+      icon: 'box_add',
       link: 'h3xclusive/tier',
     },
-    {
-      title: 'Create a Portfolio Collection',
-      description: 'Highlight your best content in collections',
-      icon: <span className="material-symbols-outlined text-gray-300">dataset</span>,
-      link: 'portfolio',
-    },
-    {
-      title: 'Create a h3xclusive Tier',
-      description: 'h3xclusive tiers for your subscribers.',
-      icon: <span className="material-symbols-outlined text-gray-300">box_add</span>,
-      link: 'h3xclusive/tier',
-    }
+  ], [])
 
-  ]
+  // Memoize navigation handlers
+  const handleBack = useCallback(() => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back()
+    } else {
+      router.push('/')
+    }
+  }, [router])
+
+  const handleItemClick = useCallback((link: string) => {
+    router.push(`/create/${link}`)
+  }, [router])
+
+  // Memoize individual item component
+  const CreateItemCard = React.memo<{ item: CreateItem; index: number }>(({ item, index }) => (
+    <div
+      className="group border border-gray-600 py-3 px-3 rounded-lg cursor-pointer transition-all duration-200 hover:border-yellow-500"
+      onClick={() => handleItemClick(item.link)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleItemClick(item.link)
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`${item.title}: ${item.description}`}
+    >
+      <div className="flex flex-col items-center text-center">
+        <div className="flex items-center justify-center w-1/5 mx-auto my-auto mb-2">
+          <span className="material-symbols-outlined text-gray-300">
+            {item.icon}
+          </span>
+        </div>
+        <div>
+          <h3 className="text-md font-medium text-yellow-500">
+            {item.title} &rarr;
+          </h3>
+          <p className="mt-1 text-sm text-gray-300">
+            {item.description}
+          </p>
+        </div>
+      </div>
+    </div>
+  ))
+
+  CreateItemCard.displayName = 'CreateItemCard'
 
   return (
-    <div className='h-screen bg-stone-950 text-center flex flex-col'>
-      <div className='flex flex-row gap-8 text-center pt-3 mx-auto'>
-        <div className='pl-3 pt-2 absolute left-0'>
-          <ArrowLeftIcon width={24} color='white' onClick={() => history.back()} className='cursor-pointer'/>
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-semibold text-yellow-500 text-center">Create</h2>
-      </div>
-      <div className="mt-3 px-6 grid grid-cols-2 gap-6 border-t border-gray-600 py-6 sm:h-[48rem] sm:w-[36rem] mx-auto">
-        {items.map((item, itemNo) => (
-          <div key={itemNo} className="border-[1px] border-gray-600 py-3 rounded-lg cursor-pointer hover:border-yellow-500" onClick={() => router.push(`/create/${item.link}`)}>
-            <div className='flex flex-col px-3'>
-              <div className='flex my-auto w-1/5 items-center justify-center mx-auto'>
-                {item.icon}
-              </div>
-              <div>
-                <h3 className="text-md font-medium text-yellow-500">
-                  {item.title} &rarr;
-                </h3>
-                <p className="mt-1 text-sm text-gray-300">{item.description}</p>
-              </div>
+    <div className="min-h-screen bg-stone-950 flex flex-col">
+      {/* Header */}
+      <header className="relative flex items-center justify-center pt-6 pb-4">
+        <button
+          onClick={handleBack}
+          className="absolute left-4 p-2 rounded-full btn-ghost bg-transparent border-none transition-colors"
+          aria-label="Go back"
+        >
+          <ArrowLeftIcon className="w-6 h-6 text-white" />
+        </button>
+        <h1 className="text-3xl sm:text-5xl font-semibold text-yellow-500">
+          Create
+        </h1>
+      </header>
+
+      {/* Content */}
+      <main className="flex-1 px-6">
+        <div className="mx-auto sm:h-[48rem] sm:w-[36rem]">
+          <div className="border-t border-gray-600 pt-6">
+            <div className="grid grid-cols-2 gap-6">
+              {items.map((item, index) => (
+                <CreateItemCard key={item.link} item={item} index={index} />
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      
+        </div>
+      </main>
     </div>
   )
 }
 
-export default Create;
+export default Create

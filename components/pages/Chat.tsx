@@ -1,153 +1,116 @@
-'use client'
+// components/ChatSection.tsx
+'use client';
 
-import React, { useState } from 'react'
-import BottomNav from '@/components/nav/BottomNav'
-import Navbar from '@/components/nav/Navbar'
-import MediaQuery from 'react-responsive'
-import Sidebar from '../nav/Sidebar'
-import { motion } from 'framer-motion'
+import { useState } from 'react';
+import Navbar from '../nav/Navbar';
+import BottomNav from '../nav/BottomNav';
+import { useRouter } from 'next/navigation';
 import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
-import { useRouter } from 'next/navigation'
-import CreateChatModal from '../modals/CreateChatModal'
+import { useAtom } from 'jotai';
+import { userAtom } from '@/store/authState';
+import { whiteColor } from '@/constants/colors';
 
-const Chat = () => {
 
-  const tabVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } }
-  };
-  
+const TABS = ['DMs', 'Paid DMs', 'Colab Requests', 'Gigs'];
+
+const ChatSection = () => {
+  const [activeTab, setActiveTab] = useState('DMs');
+
+  const [user] = useAtom(userAtom)
+
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleCreateChat = (username: string) => {
-    // You can route to a new chat or make API call here
-    console.log('Starting chat with:', username)
-  }
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'DMs': return <DMs />;
+      case 'Paid DMs': return <PaidDMs />;
+      case 'Colab Requests': return <ColabRequests />;
+      case 'Gigs': return <Gigs />;
+      default: return null;
+    }
+  };
 
 
   return (
-    <div className='bg-stone-950 h-screen'>
-      <div>
-          <MediaQuery maxWidth={550}>
-              <Navbar/>
-              <BottomNav/>
-              <div className="w-full bg-stone-950 border-r border-stone-950 p-4">
-                <div className='flex flex-row justify-between items-center mb-4'>
-                  <ChevronLeftIcon width={24} color="#eab308" onClick={() => history.back()}/>
-                  <h2 className="text-2xl font-bold text-white">Messages</h2>
-                  <PencilSquareIcon width={32} color='#FFFFFF' className='' onClick={() => setIsModalOpen(true)}/>
-                </div>
-                <div className="space-y-4">
-                  <div className="cursor-pointer py-3 bg-stone-950 rounded-lg hover:bg-stone-600 transition" onClick={() => router.push(`/chats/1234`)}>
-                    <div className='flex flex-row gap-3'>
-                      <img
-                          src={'/defaultProfilePhoto.png'}
-                          alt="avatar"
-                          className="w-16 h-16 rounded-full border border-yellow-400"
-                      />
-                      <div className='flex flex-col'>
-                        <p className="font-semibold text-white text-lg">Ronald Prithiv</p>
-                        <p className="text-md text-gray-400 truncate">Hey, how’s it going?</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="cursor-pointer py-3 bg-stone-950 rounded-lg hover:bg-stone-600 transition">
-                    <div className='flex flex-row gap-3'>
-                      <img
-                          src={'/defaultProfilePhoto.png'}
-                          alt="avatar"
-                          className="w-16 h-16 rounded-full border border-yellow-400"
-                      />
-                      <div className='flex flex-col'>
-                        <p className="font-semibold text-white text-lg">Pandiaraj</p>
-                        <p className="text-md text-gray-400 truncate">Hey, how’s it going?</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="cursor-pointer py-3 bg-stone-950 rounded-lg hover:bg-stone-600 transition">
-                    <div className='flex flex-row gap-3'>
-                      <img
-                          src={'/defaultProfilePhoto.png'}
-                          alt="avatar"
-                          className="w-16 h-16 rounded-full border border-yellow-400"
-                      />
-                      <div className='flex flex-col'>
-                        <p className="font-semibold text-white text-lg">xen dante</p>
-                        <p className="text-md text-gray-400 truncate">Hey, how’s it going?</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* More chats... */}
-                </div>
-              </div>
-              <CreateChatModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onCreateChat={handleCreateChat}
-              />
-          </MediaQuery>
-
-          <MediaQuery minWidth={551} maxWidth={99999}>
-              <Sidebar/>
-              <motion.div variants={tabVariants} initial="hidden" animate="visible" className="text-white space-y-6 flex flex-col pl-80">
-              <div className="w-full bg-stone-950 border-r border-stone-950 p-4">
-                <div className='flex flex-row'>
-                  <h2 className="text-xl font-bold mb-4 text-white">Messages</h2>
-                  <PencilSquareIcon width={24} color='#FFFFFF'/>
-                </div>
-                <div className="space-y-4">
-                  <div className="cursor-pointer py-3 bg-stone-950 rounded-lg hover:bg-stone-600 transition">
-                    <div className='flex flex-row gap-3'>
-                      <img
-                          src={'/defaultProfilePhoto.png'}
-                          alt="avatar"
-                          className="w-16 h-16 rounded-full border border-yellow-400"
-                      />
-                      <div className='flex flex-col'>
-                        <p className="font-semibold text-white text-lg">John Doe</p>
-                        <p className="text-md text-gray-400 truncate">Hey, how’s it going?</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="cursor-pointer py-3 bg-stone-950 rounded-lg hover:bg-stone-600 transition">
-                    <div className='flex flex-row gap-3'>
-                      <img
-                          src={'/defaultProfilePhoto.png'}
-                          alt="avatar"
-                          className="w-16 h-16 rounded-full border border-yellow-400"
-                      />
-                      <div className='flex flex-col'>
-                        <p className="font-semibold text-white text-lg">John Doe</p>
-                        <p className="text-md text-gray-400 truncate">Hey, how’s it going?</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="cursor-pointer py-3 bg-stone-950 rounded-lg hover:bg-stone-600 transition">
-                    <div className='flex flex-row gap-3'>
-                      <img
-                          src={'/defaultProfilePhoto.png'}
-                          alt="avatar"
-                          className="w-16 h-16 rounded-full border border-yellow-400"
-                      />
-                      <div className='flex flex-col'>
-                        <p className="font-semibold text-white text-lg">John Doe</p>
-                        <p className="text-md text-gray-400 truncate">Hey, how’s it going?</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* More chats... */}
-                </div>
-              </div>
-              </motion.div>
-          </MediaQuery>
+    <>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className='flex flex-row justify-between pr-3'>
+        <div className='flex flex-row pt-3 gap-3'>
+          <ChevronLeftIcon width={24} color={whiteColor} className='cursor-pointer pt-2' onClick={() => router.back()} />
+          <h1 className='text-white text-2xl font-bold'>{user.username}</h1>
+        </div>
+        <PencilSquareIcon width={32} color={whiteColor} className='cursor-pointer pt-2'/>
       </div>
+      <div className='flex w-full pt-3'>
+        <label className="input rounded-full bg-transparent border-gray-300 focus:border-yellow-500 border-[1px] w-[90%] mx-auto">
+          <svg className="h-[1em] opacity-50 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></g></svg>
+          <input type="search" required placeholder="Search" className='text-gray-300'/>
+        </label>
+      </div>
+      <div className="flex flex-row justify-around border-b border-gray-700 py-2 text-white">
+        
+        {TABS.map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 font-medium transition-colors ${
+              activeTab === tab ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-400'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+      <div className="mt-4">{renderTabContent()}</div>
     </div>
-  )
-}
+    <BottomNav/>
+    </>
+  );
+};
 
-export default Chat
+export default ChatSection;
+
+// Placeholder Components (You'd replace these with real implementations)
+// File: components/sections/DMList.tsx
+export const DMs: React.FC = () => {
+  return (
+    <div className="text-white p-4">
+      <h2 className="text-xl font-bold mb-2">Direct Messages</h2>
+      {/* Replace with actual DMs UI */}
+      <p>No messages yet.</p>
+    </div>
+  );
+};
+
+// File: components/sections/PaidDMList.tsx
+export const PaidDMs: React.FC = () => {
+  return (
+    <div className="text-white p-4">
+      <h2 className="text-xl font-bold mb-2">Paid DMs</h2>
+      {/* Replace with actual Paid DMs UI */}
+      <p>No paid messages yet.</p>
+    </div>
+  );
+};
+
+// File: components/sections/ColabRequests.tsx
+export const ColabRequests: React.FC = () => {
+  return (
+    <div className="text-white p-4">
+      <h2 className="text-xl font-bold mb-2">Collaboration Requests</h2>
+      {/* Replace with actual Colab requests UI */}
+      <p>No collaboration requests yet.</p>
+    </div>
+  );
+};
+
+// File: components/sections/GigChats.tsx
+export const Gigs: React.FC = () => {
+  return (
+    <div className="text-white p-4">
+      <h2 className="text-xl font-bold mb-2">Gigs</h2>
+      {/* Replace with actual Gigs UI */}
+      <p>No gigs booked or listed.</p>
+    </div>
+  );
+};

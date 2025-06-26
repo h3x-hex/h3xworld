@@ -1,718 +1,674 @@
 'use client'
 
-import { InformationCircleIcon, PhotoIcon } from '@heroicons/react/24/outline'
-import React, { useEffect, useRef, useState } from 'react'
+import { InformationCircleIcon, PhotoIcon, GifIcon } from '@heroicons/react/24/outline'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/navigation'
-import { createFeed, createGroup, fetchGroups, fetchPosts, post } from '@lens-protocol/client/actions'
-import { AnyPost, evmAddress, Group, uri } from '@lens-protocol/client'
+import { fetchGroups, fetchPosts } from '@lens-protocol/client/actions'
+import { AnyPost, evmAddress, Group } from '@lens-protocol/client'
 import { client } from '@/helper/lensClient'
 import { lensAccountOnly } from '@lens-chain/storage-client'
 import { storageClient } from '@/helper/storageClient'
 import { chains } from '@lens-chain/sdk/viem'
-import { feed, group, image, MediaImageMimeType, MetadataAttributeType, textOnly } from '@lens-protocol/metadata'
-import { handleOperationWith, signMessageWith } from '@lens-protocol/client/ethers'
-import { ethers} from 'ethers'
-import { Carousel } from 'react-responsive-carousel';
-import { TrashIcon } from '@heroicons/react/24/solid';
-import { AnimatePresence } from 'framer-motion';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { MediaImageMimeType } from '@lens-protocol/metadata'
+import { ethers } from 'ethers'
+import { Carousel } from 'react-responsive-carousel'
+import { TrashIcon } from '@heroicons/react/24/solid'
+import { AnimatePresence } from 'framer-motion'
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { useAtom } from 'jotai'
 import { userAtom } from '@/store/authState'
+import GifPicker from "../posts/GifPicker"
+import { Picker } from 'emoji-mart'
+import { goldColor } from "@/constants/colors"
 import Modal from '@/components/Modal'
 import { uploadPostToLens } from '@/utils/uploadPostLens'
 import { uploadMediaToLens } from '@/utils/uploadMediaLens'
 
 interface PostAttachment {
-  item: string,
-  type: MediaImageMimeType,
+  item: string
+  type: MediaImageMimeType
 }
 
-type MediaFile = {
-  file: File
+interface MediaFile {
+  file: File | null
   url: string
   type: string
 }
 
+interface DestinationState {
+  portfolio: string
+  club: Group | null
+  h3xclusive: string[]
+}
+
+// Constants
+const MAX_FILE_SIZE_MB = 8
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+
+const FEED_ADDRESSES = {
+  portfolio: "0x48d5E01d21Ad51993c297935b3d618b99f7e2868",
+  portfolioCollection: "0xf7B7F7Faa314d4496bc7EBF2884A03802cEFF7a1",
+  h3xclusive: "0x74F9f2Fa4fe6c15284a911245957d06AC33EaB2F",
+  post: "0x63c3579756B353D26876A9A5A6f563165C320b7f",
+} as const
+
 export default function CreatePost() {
-  
+  // State management
   const [media, setMedia] = useState<MediaFile[]>([])
-  const [content, setContent] = useState('');
-  const [upgradePrompt, setUpgradePrompt] = useState(false)
+  const [content, setContent] = useState('')
   const [currentSlide, setCurrentSlide] = useState(0)
   const [selectedDest, setSelectedDest] = useState<string[]>([])
-  const [showPortfolioModal, setShowPortfolioModal] = useState(false)
-  const [showClubModal, setShowClubModal] = useState(false)
-  const [showTierModal, setShowTierModal] = useState(false)
-  const [portfolioCollection, setPortfolioCollection] = useState('')
-  const [clubSelection, setClubSelection] = useState<Group | null>(null)
-  const [tierSelection, setTierSelection] = useState<string[]>([])
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [showGifPicker, setShowGifPicker] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
+  const [destinationData, setDestinationData] = useState<DestinationState>({
+    portfolio: '',
+    club: null,
+    h3xclusive: []
+  })
   
-  const [tierList, setTierList] = useState<AnyPost[]>([]);
-  const [portfolioCollectionList, setPortfolioCollectionList] = useState<string[]>([]);
-  const [clubList, setClubList] = useState<Group[]>([]);
-
+  // Modal states
+  const [modals, setModals] = useState({
+    portfolio: false,
+    club: false,
+    tier: false
+  })
+  
+  // Data states
+  const [tierList, setTierList] = useState<AnyPost[]>([])
+  const [portfolioCollectionList, setPortfolioCollectionList] = useState<string[]>([])
+  const [clubList, setClubList] = useState<Group[]>([])
+  
+  // Loading states
   const [isCreating, setIsCreating] = useState(false)
-  const [isLoading, setIsLoading] = useState(false);  
+  const [isLoading, setIsLoading] = useState(false)
+  const [upgradePrompt, setUpgradePrompt] = useState(false)
+  
+  // Refs and atoms
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [user] = useAtom(userAtom)
+  const router = useRouter()
 
-  const [user] = useAtom(userAtom);
+  // Memoized values
+  const isSubmitDisabled = useMemo(() => {
+    return !content.trim() || isLoading || 
+           (selectedDest.includes('portfolio') && !destinationData.portfolio) ||
+           (selectedDest.includes('club') && !destinationData.club) ||
+           (selectedDest.includes('h3xclusive') && destinationData.h3xclusive.length === 0)
+  }, [content, isLoading, selectedDest, destinationData])
 
-  const router = useRouter();
-
-  const maxSizeMB = 8;
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Optimized file handling
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
 
     const selectedFiles = Array.from(files)
-    const oversized = selectedFiles.find((file) => file.size > maxSizeMB * 1024 * 1024)
+    const oversizedFiles = selectedFiles.filter(file => file.size > MAX_FILE_SIZE_BYTES)
     
-    if (oversized) {
+    if (oversizedFiles.length > 0) {
       setUpgradePrompt(true)
       return
     }
 
-    const newMedia = selectedFiles.map((file) => {
-      const type = file.type.startsWith('video') ? 'video' : 'image'
-      return {
-        file,
-        url: URL.createObjectURL(file),
-        type
+    const newMedia = selectedFiles.map(file => ({
+      file,
+      url: URL.createObjectURL(file),
+      type: file.type.startsWith('video') ? 'video' : 'image'
+    }))
+
+    setMedia(prev => [...prev, ...newMedia])
+    setUpgradePrompt(false)
+  }, [])
+
+  const addEmoji = (emoji: any) => {
+    setContent(prev => prev + emoji.native)
+  }
+
+  // Optimized destination handling
+  const handleDestinationChange = useCallback((dest: string) => {
+    setSelectedDest(prev => {
+      if (dest === 'h3xclusive') {
+        return prev.includes('h3xclusive') ? [] : ['h3xclusive']
       }
+      
+      if (prev.includes(dest)) {
+        return prev.filter(d => d !== dest)
+      }
+      
+      if (prev.includes('h3xclusive')) {
+        return [dest]
+      }
+      
+      return [...prev, dest]
     })
+  }, [])
 
-    setMedia([...media, ...newMedia])
-  }
-
-
-  const handleDestinationChange = (dest: string) => {
-    if (dest === 'h3xclusive') {
-      // Selecting h3xclusive clears all and selects only it
-      if (selectedDest.includes('h3xclusive')) {
-        setSelectedDest([]) // deselect it
-      } else {
-        setSelectedDest(['h3xclusive']) // select only h3xclusive
-      }
-    } else {
-      if (selectedDest.includes(dest)) {
-        // deselect clicked non-h3xclusive
-        setSelectedDest(selectedDest.filter(d => d !== dest))
-      } else {
-        // If h3xclusive is currently selected, deselect it and select the new one
-        if (selectedDest.includes('h3xclusive')) {
-          setSelectedDest([dest])
-        } else {
-          setSelectedDest([...selectedDest, dest])
-        }
-      }
-    }
-  }
-
-  const handleInputClick = () => {
-    if (!inputRef.current) return;
-    inputRef.current?.click();
-  };
-
-  const closePortfolioModal = () => {
-    setShowPortfolioModal(false)
-  }
-  
-  const closeClubModal = () => {
-    setShowClubModal(false)
-  }
-  
-  const closeTierModal = () => {
-    setShowTierModal(false)
-  }
-  
-
-  const handleSubmit = async () => {
-    try {
-      const acl = lensAccountOnly(
-        '0x2a88fDB064A1aFE5A0Cabf19E176B24CdA2EE1F7',
-        chains.testnet.id
-      );
-
-      setIsLoading(true);
-
-      const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!);
-      const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
-      const signer = wallet.connect(provider);
-
-      const filesURI: PostAttachment[] = await uploadMediaToLens(media);
-
-      if(selectedDest.includes('h3xclusive'))
-      {
-
-      }
-      if(selectedDest.includes('portfolio'))
-      {
-        uploadPostToLens(media.length, content, filesURI, 'portfolio', undefined, "0x48d5E01d21Ad51993c297935b3d618b99f7e2868", portfolioCollection, signer)
-      }
-      if(selectedDest.includes('club'))
-      {
-        uploadPostToLens(media.length, content, filesURI, 'club', undefined, clubSelection?.feed?.address, undefined, signer)
-      }
-      else 
-      {
-        uploadPostToLens(media.length, content, filesURI, 'post', undefined, "0x63c3579756B353D26876A9A5A6f563165C320b7f", undefined, signer)        
+  // File removal with proper cleanup
+  const removeFile = useCallback((index: number) => {
+    setMedia(prev => {
+      const fileToRemove = prev[index]
+      if (fileToRemove) {
+        URL.revokeObjectURL(fileToRemove.url)
       }
       
-      router.push(`/${user.username}`)
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const removeFile = (index: number) => {
-    setMedia((prev) => {
-      const newFiles = prev.filter((_, i) => i !== index);
+      const newFiles = prev.filter((_, i) => i !== index)
       
-      // Adjust currentSlide if needed
       if (currentSlide >= newFiles.length && newFiles.length > 0) {
-        setCurrentSlide(newFiles.length - 1);
+        setCurrentSlide(newFiles.length - 1)
+      } else if (newFiles.length === 0) {
+        setCurrentSlide(0)
       }
       
-      return newFiles;
-    });
-  };
+      return newFiles
+    })
+  }, [currentSlide])
 
-  const createPortfolioCollection = async (collectionName: string, thumbnailFile: File): Promise<void> => {
+  // Modal handlers
+  const toggleModal = useCallback((modalType: keyof typeof modals) => {
+    setModals(prev => ({ ...prev, [modalType]: !prev[modalType] }))
+  }, [])
 
-    const acl = lensAccountOnly(
-      user.accountAddress as `0x${string}`,
-      chains.testnet.id
-    );
-
-    const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!);
-    const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
-    const signer = wallet.connect(provider);
-
-    const uploadedFileUri = await storageClient.uploadFile(thumbnailFile, { acl });
-
-    uploadPostToLens(1, collectionName, [{type: MediaImageMimeType.WEBP, item: uploadedFileUri.gatewayUrl}], 'portfolioCollection', undefined, "0xf7B7F7Faa314d4496bc7EBF2884A03802cEFF7a1", undefined, signer)
-
-  }
-
-  const createClub = async (clubName: string, clubDescription: string, thumbnailFile: File): Promise<void> => {
-
-    const acl = lensAccountOnly(
-      user.accountAddress as `0x${string}`,
-      chains.testnet.id
-    );
-
-    const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!);
-    const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
-    const signer = wallet.connect(provider);
-
-    const uploadedFileUri = await storageClient.uploadFile(thumbnailFile, { acl });
-
-    const metadata = group({
-      name: clubName,
-      description: clubDescription,
-      icon: uploadedFileUri.gatewayUrl,
-    });
-
-    const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-
-    const feedMetadata = feed({
-      name: clubName,
-      description: clubDescription,
-    });
-
-    const { uri:feedUri } = await storageClient.uploadAsJson(feedMetadata);
-
-    console.log(feedUri);
+  // Optimized data fetching
+  const fetchPortfolioCollections = useCallback(async () => {
+    if (!user?.accountAddress) return
     
-    const authenticated = await client.login({
-      builder: {
-        address: signer.address,
-      },
-      signMessage: signMessageWith(signer),
-    });
-    
-    if (authenticated.isErr()) {
-      return console.error(authenticated.error);
-    }
-    
-    // SessionClient: { ... }
-    let sessionClient = authenticated.value;
+    try {
+      const result = await fetchPosts(client, {
+        filter: {
+          authors: [evmAddress(user.accountAddress)],
+          feeds: [{ feed: evmAddress(FEED_ADDRESSES.portfolioCollection) }]
+        }
+      })
 
-    await createFeed(sessionClient, {
-      metadataUri: uri(feedUri),
-    });
-    
-    const authenticated1 = await client.login({
-      accountOwner: {
-        account: user.accountAddress,
-        app: "0xa4de8E77b3F92005C84ff4dDd184b1F097aF11a2",
-        owner: wallet.address,
-      },
-      signMessage: signMessageWith(signer),
-    });
-    
-    if (authenticated1.isErr()) {
-      return console.error(authenticated1.error);
-    }
-    
-    // SessionClient: { ... }
-    sessionClient = authenticated1.value;
-
-    console.log(sessionClient);
-
-    const result1 = await createGroup(sessionClient, { 
-      metadataUri: uri(contentUri),
-      feed: {
-        metadataUri: uri(feedUri),
-      },
-    }).andThen(handleOperationWith(signer));
-
-    console.log(result1);
-    
-  }
-
-  const createH3xclusiveTier = async (tierName: string, tierDescription: string, tierPrice: number, thumbnailFile: File): Promise<void> => {
-
-    const acl = lensAccountOnly(
-      user.accountAddress as `0x${string}`,
-      chains.testnet.id
-    );
-
-    const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!);
-    const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
-    const signer = wallet.connect(provider);
-
-    const uploadedFileUri = await storageClient.uploadFile(thumbnailFile, { acl });
-
-    const metadata = image({
-      title: tierName,
-      image: {
-        type: MediaImageMimeType.WEBP,
-        item: uploadedFileUri.gatewayUrl
-      },
-      attributes:[
-        {
-          key: 'tierDescription',
-          type: MetadataAttributeType.STRING, //0
-          value: tierDescription,
-        },
-        {
-          key: 'tierPrice',
-          type: MetadataAttributeType.NUMBER, //0
-          value: tierPrice.toString(),
-        },
-      ]
-    });
-    const { uri:contentUri } = await storageClient.uploadAsJson(metadata);
-    
-    const resumed = await client.resumeSession();
-      
-    if (resumed.isErr()) {
-      return console.error(resumed.error);
-    }
-    
-    // SessionClient: { ... }
-    const sessionClient = resumed.value;
-
-    console.log(sessionClient);
-
-    const result = await post(sessionClient, { 
-      contentUri: uri(contentUri),
-      feed: evmAddress("0x74F9f2Fa4fe6c15284a911245957d06AC33EaB2F"),
-    }).andThen(handleOperationWith(signer));
-
-    console.log(result);
-    
-  }
-
-  const fetchClubs = async () => {
-    const result = await fetchGroups(client, {
-      filter: {
-        managedBy: {
-          address: evmAddress(user.accountAddress!),
-        },
-      },
-    });
-  
-    if (result.isErr()) {
-      return console.error(result.error);
-    }
-  
-    const { items, pageInfo } = result.value;
-    console.log('Updated clubs:', items, pageInfo);
-    setClubList([...items]);
-  };
-
-  const fetchPortfolioCollections = async () => {
-    const result = await fetchPosts(client, {
-      filter: {
-        authors: [evmAddress(user.accountAddress!)],
-        feeds: [
-          {
-            feed: evmAddress("0xf7B7F7Faa314d4496bc7EBF2884A03802cEFF7a1"),
-          }
-        ],
-      },
-    });
-  
-    if (result.isErr()) {
-      return console.error(result.error);
-    }
-  
-    const { items } = result.value;
-    const titles: string[] = [];
-
-    for (const item of items) {
-      if (item.__typename === 'Post' && item.metadata.__typename === 'ImageMetadata') {
-        titles.push(item.metadata.title!);
+      if (result.isErr()) {
+        console.error('Failed to fetch portfolio collections:', result.error)
+        return
       }
+
+      const titles = result.value.items
+        .filter(item => item.__typename === 'Post' && item.metadata.__typename === 'ImageMetadata')
+        .map(item => (item as any).metadata.title)
+        .filter(Boolean)
+
+      setPortfolioCollectionList(titles)
+    } catch (error) {
+      console.error('Error fetching portfolio collections:', error)
     }
-    setPortfolioCollectionList(titles)
-    console.log(portfolioCollectionList)
+  }, [user?.accountAddress])
 
-  };
+  const fetchClubs = useCallback(async () => {
+    if (!user?.accountAddress) return
+    
+    try {
+      const result = await fetchGroups(client, {
+        filter: {
+          managedBy: { address: evmAddress(user.accountAddress) }
+        }
+      })
 
-  const fetchTiers = async () => {
-    const result = await fetchPosts(client, {
-      filter: {
-        authors: [evmAddress(user.accountAddress!)],
-        feeds: [
-          {
-            feed: evmAddress("0x74F9f2Fa4fe6c15284a911245957d06AC33EaB2F"),
-          }
-        ],
-      },
-    });
-  
-    if (result.isErr()) {
-      return console.error(result.error);
+      if (result.isErr()) {
+        console.error('Failed to fetch clubs:', result.error)
+        return
+      }
+
+      setClubList([...result.value.items]);
+    } catch (error) {
+      console.error('Error fetching clubs:', error)
     }
-  
-    const { items } = result.value;
-    setTierList([...items]);
-  };
+  }, [user?.accountAddress])
 
+  const fetchTiers = useCallback(async () => {
+    if (!user?.accountAddress) return
+    
+    try {
+      const result = await fetchPosts(client, {
+        filter: {
+          authors: [evmAddress(user.accountAddress)],
+          feeds: [{ feed: evmAddress(FEED_ADDRESSES.h3xclusive) }]
+        }
+      })
+
+      if (result.isErr()) {
+        console.error('Failed to fetch tiers:', result.error)
+        return
+      }
+
+      setTierList([...result.value.items])
+    } catch (error) {
+      console.error('Error fetching tiers:', error)
+    }
+  }, [user?.accountAddress])
+
+  // Main submit handler
+  const handleSubmit = useCallback(async () => {
+    if (!user?.wallet || !user?.pin || !user?.accountAddress) {
+      console.error('User authentication data missing')
+      return
+    }
+
+    try {
+      setIsLoading(true)
+
+      const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet, user.pin)
+      const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx')
+      const signer = wallet.connect(provider)
+
+      const filesURI: PostAttachment[] = await uploadMediaToLens(media)
+
+      // Handle different destination types
+      if (selectedDest.includes('h3xclusive')) {
+        // Handle h3xclusive post
+        await uploadPostToLens(
+          media.length, 
+          content, 
+          filesURI, 
+          'h3xclusive', 
+          undefined, 
+          FEED_ADDRESSES.h3xclusive, 
+          undefined, 
+          signer
+        )
+      } else if (selectedDest.includes('portfolio')) {
+        await uploadPostToLens(
+          media.length, 
+          content, 
+          filesURI, 
+          'portfolio', 
+          undefined, 
+          FEED_ADDRESSES.portfolio, 
+          destinationData.portfolio, 
+          signer
+        )
+      } else if (selectedDest.includes('club')) {
+        await uploadPostToLens(
+          media.length, 
+          content, 
+          filesURI, 
+          'club', 
+          undefined, 
+          destinationData.club?.feed?.address, 
+          undefined, 
+          signer
+        )
+      } else {
+        await uploadPostToLens(
+          media.length, 
+          content, 
+          filesURI, 
+          'post', 
+          undefined, 
+          FEED_ADDRESSES.post, 
+          undefined, 
+          signer
+        )
+      }
+
+      router.push(`/${user.username}`)
+    } catch (error) {
+      console.error('Error creating post:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [user, media, content, selectedDest, destinationData, router])
+
+  // Create handlers for modals
+  const createPortfolioCollection = useCallback(async (collectionName: string, thumbnailFile: File) => {
+    if (!user?.wallet || !user?.pin || !user?.accountAddress) return
+
+    const acl = lensAccountOnly(user.accountAddress as `0x${string}`, chains.testnet.id)
+    const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet, user.pin)
+    const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx')
+    const signer = wallet.connect(provider)
+
+    const uploadedFileUri = await storageClient.uploadFile(thumbnailFile, { acl })
+
+    await uploadPostToLens(
+      1, 
+      collectionName, 
+      [{ type: MediaImageMimeType.WEBP, item: uploadedFileUri.gatewayUrl }], 
+      'portfolioCollection', 
+      undefined, 
+      FEED_ADDRESSES.portfolioCollection, 
+      undefined, 
+      signer
+    )
+  }, [user])
+
+  // Effects
   useEffect(() => {
-    setShowPortfolioModal(false)
-    setShowClubModal(false)
-    setShowTierModal(false)
-
-    if (!user) return;
+    if (!user) return
 
     if (selectedDest.includes('portfolio')) {
-      fetchPortfolioCollections();
+      fetchPortfolioCollections()
     }
-
     if (selectedDest.includes('club')) {
-      fetchClubs();
+      fetchClubs()
     }
-
     if (selectedDest.includes('h3xclusive')) {
-      fetchTiers();
+      fetchTiers()
     }
+  }, [selectedDest, user, fetchPortfolioCollections, fetchClubs, fetchTiers])
 
-  }, [selectedDest])
-  
+  // Cleanup effect for media URLs
+  useEffect(() => {
+    return () => {
+      media.forEach(({ url }) => URL.revokeObjectURL(url))
+    }
+  }, [])
 
-  
-  return (
-    <div className="max-w-xl mx-auto bg-black text-white p-6 rounded-xl h-full">
-      <ArrowLeftIcon width={24} color='white' onClick={() => router.push('/create')} className='absolute top-10 sm:left-8 sm:top-6'/>
-      <div className='h-12 border-b-2 border-gray-600 flex flex-row'>
-        <h1 className='pt-2 text-3xl text-yellow-500 mx-auto'>Create Post</h1>
-      </div>
-
-      <div className='pt-4'>
-        <textarea
-          placeholder="Write something..."
-          className="w-full bg-stone-900 border border-gray-600 rounded-lg p-2 text-white mb-4 h-64"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-      </div>
-
-      {media.length > 0 && (
-        <Carousel
-          selectedItem={currentSlide}
-          onChange={(index) => setCurrentSlide(index)}
-          showThumbs={false}
-          showStatus={false}
-          infiniteLoop
-          useKeyboardArrows
-          dynamicHeight={false}
-          className="rounded-md overflow-hidden h-64 sm:h-96 w-full border-2 border-gray-600 border-dashed mb-4"
-        >
-          {media.map(({ file, url }, idx) => (
-            <div key={url} className="relative h-64 sm:h-96 w-full">
-              {file.type.startsWith('video') ? (
-                <video src={url} controls className="w-full h-64 sm:h-96 object-cover rounded-box" />
-              ) : (
-                <img src={url} className="w-full h-64 sm:h-96 object-cover rounded-box" alt={`preview-${idx}`} />
-              )}
-              <button
-                onClick={() => removeFile(currentSlide)}
-                className="absolute top-2 right-6 bg-black bg-opacity-70 rounded-full p-1 text-white"
-              >
-                <TrashIcon className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </Carousel>
-      )}
-      <div className='flex flex-row gap-40 sm:gap-76 pb-3'>
-        <input ref={inputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => handleFileChange(e)} className='hidden'/>
-        <PhotoIcon className='cursor-pointer' width={36} color='#F0B100' onClick={() => handleInputClick()}/>
-      </div>
-      {upgradePrompt && (
-        <div className="bg-yellow-900 text-yellow-400 p-3 rounded text-sm mb-4">
-          One or more files exceed the 8MB limit. <br />
-          <strong>Upgrade to h3xPro</strong> for larger post support.
+  if (!user) {
+    return (
+      <div className="max-w-xl mx-auto bg-black text-white p-6 rounded-xl h-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading loading-spinner loading-lg"></div>
+          <p className="mt-4 text-gray-400">Loading...</p>
         </div>
-      )}
+      </div>
+    )
+  }
 
-      
-
-      <div className="mb-4 space-y-2">
-        <div className='flex flex-row gap-1'>
-          <label className="block font-semibold">Where should this post appear?</label>
-          <div className="tooltip" data-tip="All posts show on your profile posts section in addition to your selection— except h3xclusive, which is only visible to members.">
-            <button className="btn btn-circle w-6 h-6"><InformationCircleIcon/></button>
+  return (
+    <div className="max-w-xl mx-auto bg-black text-white p-6 rounded-xl min-h-screen">
+        {/* Header */}
+        <div className="flex items-center mb-6 w-full border-b-2 border-gray-600">
+          <button
+            onClick={() => router.push('/create')}
+            className="btn-ghost bg-transparent border-none transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeftIcon className="w-6 h-6 text-white" />
+          </button>
+          <div className='h-12 flex flex-row mx-auto w-full'>
+            <h1 className='text-3xl text-yellow-500 mx-auto pr-4'>Create Post</h1>
           </div>
         </div>
-        <div className="flex flex-col gap-2">
-          <label><input type="checkbox" className='checkbox checkbox-warning' checked={selectedDest.includes('portfolio')} onChange={() => handleDestinationChange('portfolio')} /> Portfolio</label>
-          <AnimatePresence mode="wait">
-          {selectedDest.includes('portfolio') && (
-            <>
-              <div className="dropdown">
-                <div tabIndex={0} role="button" className="btn w-full justify-between bg-neutral text-white">
-                  {portfolioCollection
-                    ? portfolioCollection
-                    : 'Select Collection'}
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
 
-                <ul tabIndex={0} className="dropdown-content z-[1] menu pb-6 shadow bg-stone-950 rounded-lg w-64 max-h-60 overflow-y-auto">
-                  {portfolioCollectionList.length > 0 ? (
-                    portfolioCollectionList.map((name) => (
-                      <li key={name}>
-                        <label className="label cursor-pointer justify-start gap-2">
-                          <input
-                            type="radio"
-                            name="portfolio"
-                            className="radio radio-warning radio-sm"
-                            checked={portfolioCollection === name}
-                            onChange={() => setPortfolioCollection(name)}
-                          />
-                          <span className="label-text">{name}</span>
-                        </label>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-sm text-gray-400 px-2 py-1">No collections available</li>
-                  )}
-                </ul>
-              </div>
-
-              <button
-                onClick={() => setShowPortfolioModal(true)}
-                className="text-yellow-500 underline text-sm mt-2"
-              >
-                Create Collection
-              </button>
-            </>
-          )}
-
-          </AnimatePresence>
-
-
-          <label><input type="checkbox" className='checkbox checkbox-warning' checked={selectedDest.includes('club')} onChange={() => handleDestinationChange('club')} /> Club</label>
-          <AnimatePresence mode="wait">
-          {selectedDest.includes('club') && (
-            <>
-              <div className="dropdown">
-                <div tabIndex={0} role="button" className="btn w-full justify-between bg-neutral text-white">
-                  {clubSelection
-                    ? clubList.find((club) => club.metadata?.name === clubSelection.metadata?.name)?.metadata?.name ?? 'Select Club'
-                    : 'Select Club'}
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-
-                <ul tabIndex={0} className="dropdown-content z-[1] menu pb-6 shadow bg-stone-950 rounded-lg w-64 max-h-60 overflow-y-auto">
-                  {clubList.length > 0 ? (
-                    clubList.map((club) => (
-                      <li key={club.metadata?.id}>
-                        <label className="label cursor-pointer justify-start gap-2">
-                          <input
-                            type="radio"
-                            name="club"
-                            className="radio radio-warning radio-sm"
-                            checked={clubSelection?.metadata?.name === club.metadata?.name}
-                            onChange={() => setClubSelection(club)}
-                          />
-                          <span className="label-text">{club.metadata?.name}</span>
-                        </label>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-sm text-gray-400 px-2 py-1">No clubs available</li>
-                  )}
-                </ul>
-              </div>
-
-              <button onClick={() => setShowClubModal(true)} className="text-yellow-500 underline text-sm mt-2">
-                Create Club
-              </button>
-            </>
-          )}
-
-          </AnimatePresence>
-
-
-          <label><input type="checkbox" className='checkbox checkbox-warning' checked={selectedDest.includes('h3xclusive')} onChange={() => handleDestinationChange('h3xclusive')} /> h3xclusive</label>
-          <AnimatePresence mode="wait">
-            {selectedDest.includes('h3xclusive') && (
-              <>
-              <div className="dropdown">
-                <div tabIndex={0} role="button" className="btn w-full justify-between bg-neutral text-white">
-                  {tierSelection.length > 0 ? `${tierSelection.length} Tier${tierSelection.length > 1 ? 's' : ''} Selected` : 'Select Tier(s)'}
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-                <ul tabIndex={0} className="dropdown-content z-[1] menu pb-6 shadow bg-stone-950 rounded-lg w-64 max-h-60 overflow-y-auto">
-                  {tierList.length > 0 ? (
-                    tierList.filter((tier) => tier.__typename === 'Post').map((tier) => (
-                      <li key={tier.id}>
-                        <label className="label cursor-pointer justify-start gap-2">
-                          <input
-                            type="checkbox"
-                            className="checkbox checkbox-warning checkbox-sm"
-                            checked={tierSelection.includes(tier.id)}
-                            onChange={() => {
-                              if (tierSelection.includes(tier.id)) {
-                                setTierSelection(tierSelection.filter((id) => id !== tier.id))
-                              } else {
-                                setTierSelection([...tierSelection, tier.id])
-                              }
-                            }}
-                          />
-                          {tier.metadata.__typename === 'ImageMetadata' && <span className="label-text">{tier.metadata.title}</span>}
-                        </label>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="text-sm text-gray-400 px-2 py-1">No tiers available</li>
-                  )}
-                </ul>
-                
-              </div>
-              <button onClick={() => setShowTierModal(true)} className="text-yellow-500 underline text-sm">Create Tier</button>
-              </>
-            )}
-          </AnimatePresence>
+        {/* Content Input */}
+        <div className="mb-6">
+          <textarea
+            placeholder="Write something..."
+            className="w-full bg-stone-900 border border-gray-600 rounded-lg p-4 text-white h-64 resize-none focus:border-yellow-500 focus:outline-none transition-colors"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            maxLength={5000}
+          />
+          <div className="text-right text-sm text-gray-400 mt-1">
+            {content.length}/5000
+          </div>
         </div>
+
+        {/* Media Preview */}
+        {media.length > 0 && (
+          <div className="mb-6">
+            <Carousel
+              selectedItem={currentSlide}
+              onChange={setCurrentSlide}
+              showThumbs={false}
+              showStatus={false}
+              infiniteLoop={media.length > 1}
+              useKeyboardArrows
+              dynamicHeight={false}
+              className="rounded-lg overflow-hidden border-2 border-gray-600"
+            >
+              {media.map(({ file, url }, idx) => (
+                <div key={url} className="relative h-64 sm:h-96">
+                  {file && file.type.startsWith('video') ? (
+                    <video 
+                      src={url} 
+                      controls 
+                      className="w-full h-full object-cover" 
+                      preload="metadata"
+                    />
+                  ) : (
+                    <img 
+                      src={url} 
+                      className="w-full h-full object-cover" 
+                      alt={`Preview ${idx + 1}`}
+                      loading="lazy"
+                    />
+                  )}
+                  <button
+                    onClick={() => removeFile(idx)}
+                    className="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 text-white hover:bg-opacity-90 transition-opacity"
+                    aria-label="Remove media"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </Carousel>
+            <div className="text-center text-sm text-gray-400 mt-2">
+              {media.length > 1 && `${currentSlide + 1} of ${media.length}`}
+            </div>
+          </div>
+        )}
+
+        {/* Media Upload */}
+        <div className='flex flex-row gap-4 pb-3'>
+          <input ref={inputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => handleFileChange(e)} className='hidden'/>
+          <PhotoIcon className='cursor-pointer' width={36} color={goldColor} onClick={() => inputRef.current?.click()}/>
+          <GifIcon className="cursor-pointer" width={36} color={goldColor} onClick={() => setShowGifPicker(true)}/>
+        </div>
+
+        {/* Upgrade Prompt */}
+        {upgradePrompt && (
+          <div className="bg-yellow-900 text-yellow-100 p-4 rounded-lg mb-6">
+            <p className="font-semibold">File size limit exceeded</p>
+            <p className="text-sm">
+              One or more files exceed the {MAX_FILE_SIZE_MB}MB limit. 
+              <br />
+              <strong>Upgrade to h3xPro</strong> for larger file support.
+            </p>
+          </div>
+        )}
+
+        {/* Destination Selection */}
+        <div className="mb-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold">Where should this post appear?</label>
+            <div className="tooltip" data-tip="All posts show on your profile posts section in addition to your selection— except h3xclusive, which is only visible to members.">
+              <InformationCircleIcon className="w-6 h-6 text-gray-400 cursor-help" />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {/* Portfolio Option */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="checkbox checkbox-warning" 
+                  checked={selectedDest.includes('portfolio')} 
+                  onChange={() => handleDestinationChange('portfolio')} 
+                />
+                <span>Portfolio</span>
+              </label>
+              
+              <AnimatePresence>
+                {selectedDest.includes('portfolio') && (
+                  <div className="ml-6 space-y-2">
+                    <select
+                      className="select select-bordered w-full bg-stone-900 rounded-full h-12"
+                      value={destinationData.portfolio}
+                      onChange={(e) => setDestinationData(prev => ({ ...prev, portfolio: e.target.value }))}
+                    >
+                      <option value="">Select Collection</option>
+                      {portfolioCollectionList.map(name => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => toggleModal('portfolio')}
+                      className="text-yellow-500 underline text-sm hover:text-yellow-400"
+                    >
+                      Create Collection
+                    </button>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Club Option */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer rounded-full">
+                <input 
+                  type="checkbox" 
+                  className="checkbox checkbox-warning" 
+                  checked={selectedDest.includes('club')} 
+                  onChange={() => handleDestinationChange('club')} 
+                />
+                <span>Club</span>
+              </label>
+              
+              <AnimatePresence>
+                {selectedDest.includes('club') && (
+                  <div className="ml-6 space-y-2">
+                    <select
+                      className="select select-bordered w-full bg-stone-900 rounded-full h-12"
+                      value={destinationData.club?.metadata?.id || ''}
+                      onChange={(e) => {
+                        const selectedClub = clubList.find(club => club.metadata?.id === e.target.value)
+                        setDestinationData(prev => ({ ...prev, club: selectedClub || null }))
+                      }}
+                    >
+                      <option value="">Select Club</option>
+                      {clubList.map(club => (
+                        <option key={club.metadata?.id} value={club.metadata?.id}>
+                          {club.metadata?.name}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => toggleModal('club')}
+                      className="text-yellow-500 underline text-sm hover:text-yellow-400"
+                    >
+                      Create Club
+                    </button>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* H3xclusive Option */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="checkbox checkbox-warning" 
+                  checked={selectedDest.includes('h3xclusive')} 
+                  onChange={() => handleDestinationChange('h3xclusive')} 
+                />
+                <span>h3xclusive</span>
+              </label>
+              
+              <AnimatePresence>
+                {selectedDest.includes('h3xclusive') && (
+                  <div className="ml-6 space-y-2">
+                    <div className="border border-gray-600 p-3 max-h-40 overflow-y-auto rounded-xl">
+                      {tierList.length > 0 ? (
+                        tierList
+                          .filter(tier => tier.__typename === 'Post')
+                          .map(tier => (
+                            <label key={tier.id} className="flex items-center gap-2 cursor-pointer py-1">
+                              <input
+                                type="checkbox"
+                                className="checkbox checkbox-warning checkbox-sm"
+                                checked={destinationData.h3xclusive.includes(tier.id)}
+                                onChange={(e) => {
+                                  const newSelection = e.target.checked
+                                    ? [...destinationData.h3xclusive, tier.id]
+                                    : destinationData.h3xclusive.filter(id => id !== tier.id)
+                                  setDestinationData(prev => ({ ...prev, h3xclusive: newSelection }))
+                                }}
+                              />
+                              <span className="text-sm">
+                                {tier.metadata.__typename === 'ImageMetadata' ? tier.metadata.title : 'Unnamed Tier'}
+                              </span>
+                            </label>
+                          ))
+                      ) : (
+                        <p className="text-sm text-gray-400">No tiers available</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => toggleModal('tier')}
+                      className="text-yellow-500 underline text-sm hover:text-yellow-400"
+                    >
+                      Create Tier
+                    </button>
+                  </div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button 
+          className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
+            isSubmitDisabled 
+              ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+              : 'bg-yellow-500 text-black hover:bg-yellow-400'
+          }`}
+          onClick={handleSubmit}
+          disabled={isSubmitDisabled}
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="loading loading-spinner loading-sm"></span>
+              Publishing...
+            </span>
+          ) : (
+            'Publish Post'
+          )}
+        </button>
+
+        {showGifPicker && (
+          <GifPicker
+            apiKey={process.env.NEXT_PUBLIC_GIPHY_API_KEY!}
+            onSelect={(url) => setMedia((m) => [...m, {file: null, url:url, type: 'GIF'}])}
+            onClose={() => setShowGifPicker(false)}
+          />
+        )}
+
+        {showPicker && (
+          <div className="absolute z-50 mt-2">
+            <Picker
+              onSelect={addEmoji}
+              theme="dark"
+              showPreview={false}
+              showSkinTones={false}
+            />
+          </div>
+        )}
+
+        {/* Modals */}
+        <Modal
+          isOpen={modals.portfolio}
+          onClose={() => toggleModal('portfolio')}
+          title="Create Portfolio Collection"
+          fields={[
+            { name: 'collectionName', type: 'text', placeholder: 'Collection Name' },
+            { name: 'thumbnailFile', type: 'file', placeholder: 'Upload Thumbnail Image' },
+          ]}
+          isLoading={isCreating}
+          onSubmitWithData={async (data) => {
+            if (!data.thumbnailFile) {
+              alert('Please select a thumbnail image')
+              return
+            }
+            try {
+              setIsCreating(true)
+              await createPortfolioCollection(data.collectionName, data.thumbnailFile)
+              await fetchPortfolioCollections()
+              toggleModal('portfolio')
+            } catch (error) {
+              console.error('Error creating portfolio collection:', error)
+            } finally {
+              setIsCreating(false)
+            }
+          }}
+        />
       </div>
-
-      <button className="bg-yellow-500 text-black font-bold py-2 px-4 rounded hover:bg-yellow-400" onClick={() => handleSubmit()}>
-        {isLoading ? <span className="loading loading-spinner"></span> : <span>Publish Post</span>}
-      </button>
-
-      <Modal
-        isOpen={showPortfolioModal}
-        onClose={closePortfolioModal}
-        title="Create Portfolio Collection"
-        fields={[
-          { name: 'collectionName', type: 'text', placeholder: 'Collection Name' },
-          { name: 'thumbnailFile', type: 'file', placeholder: 'Upload Thumbnail Image' },
-        ]}
-        isLoading={isCreating}
-        onSubmitWithData={async (data) => {
-
-          if (!data.thumbnailFile) {
-            alert('Please select a thumbnail image')
-            return
-          }
-          try {
-            setIsCreating(true)
-            await createPortfolioCollection(data.collectionName, data.thumbnailFile);
-            await fetchPortfolioCollections();
-            setIsCreating(false)
-            setShowPortfolioModal(false)
-          } finally {
-            
-          }
-        }}
-      >
-      </Modal>
-      
-      <Modal
-        isOpen={showClubModal}
-        onClose={closeClubModal}
-        title="Create Club"
-        fields={[
-          { name: 'clubName', type: 'text', placeholder: 'Club Name' },
-          { name: 'clubDescription', type: 'textarea', placeholder: 'Club Description' },
-          { name: 'thumbnailFile', type: 'file', placeholder: 'Upload Thumbnail Image' },
-        ]}
-        isLoading={isCreating}
-        onSubmitWithData={async (data) => {
-
-          if (!data.thumbnailFile) {
-            alert('Please select a thumbnail image')
-            return
-          }
-          try {
-            setIsCreating(true)
-            await createClub(data.clubName, data.clubDescription, data.thumbnailFile);
-            await fetchClubs();
-            setIsCreating(false)
-            setShowClubModal(false)
-          } finally {
-            
-          }
-        }}
-      >
-      </Modal>
-
-      <Modal
-        isOpen={showTierModal}
-        onClose={closeTierModal}
-        title="Create h3xclusive Tier"
-        fields={[
-          { name: 'tierName', type: 'text', placeholder: 'Tier Name' },
-          { name: 'tierDescription', type: 'textarea', placeholder: 'Tier Description (Markdown supported)' },
-          { name: 'tierPrice', type: 'number', placeholder: 'Price (USD)' },
-          { name: 'thumbnailFile', type: 'file', placeholder: 'Upload Thumbnail Image' },
-        ]}
-        isLoading={isCreating}
-        onSubmitWithData={async (data) => {
-
-          if (!data.thumbnailFile) {
-            alert('Please select a thumbnail image')
-            return
-          }
-          try {
-            setIsCreating(true)
-            await createH3xclusiveTier(data.tierName, data.tierDescription, data.tierPrice, data.thumbnailFile);
-            await fetchTiers();
-            setIsCreating(false)
-            setShowTierModal(false)
-          } finally {
-            
-          }
-        }}
-      >
-      </Modal>
-
-    </div>
   )
 }
-

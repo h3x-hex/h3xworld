@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react'
 import moment from 'moment'
-import { evmAddress, Post, postId, PostReactionType } from '@lens-protocol/client'
+import { Post, postId, PostReactionType } from '@lens-protocol/client'
 import {
   ArrowPathRoundedSquareIcon,
   BookmarkIcon,
@@ -15,7 +15,7 @@ import {
   HeartIcon as HeartSolid,
   BookmarkIcon as BookmarkSolid,
 } from '@heroicons/react/24/solid'
-import { addReaction, bookmarkPost, repost, undoReaction, post } from "@lens-protocol/client/actions";
+import { addReaction, bookmarkPost, repost, undoReaction } from "@lens-protocol/client/actions";
 import { Carousel } from 'react-responsive-carousel'
 import { useRouter } from 'next/navigation'
 import { client } from '@/helper/lensClient'
@@ -25,10 +25,6 @@ import { handleOperationWith } from '@lens-protocol/client/ethers'
 import { ethers } from 'ethers'
 import ImageModal from './ImageModal'
 import QuoteModal from '../modals/QuoteModal'
-import { image, MediaImageMimeType, textOnly } from '@lens-protocol/metadata'
-import { storageClient } from '@/helper/storageClient'
-import { lensAccountOnly } from '@lens-chain/storage-client'
-import { chains } from '@lens-chain/sdk/viem'
 import { goldColor, greyColor, whiteColor } from '@/constants/colors'
 
 

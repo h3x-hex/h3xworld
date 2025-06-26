@@ -3,7 +3,7 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import { FaceSmileIcon, GifIcon, PhotoIcon, TrashIcon, XMarkIcon } from "@heroicons/react/24/outline"
-import { evmAddress, Post, postId, uri } from "@lens-protocol/client"
+import { Post, postId, uri } from "@lens-protocol/client"
 import { Carousel } from "react-responsive-carousel"
 import moment from 'moment'
 import { lensAccountOnly } from "@lens-chain/storage-client"
@@ -12,7 +12,6 @@ import { chains } from "@lens-chain/sdk/viem"
 import { storageClient } from "@/helper/storageClient"
 import { image, MediaImageMimeType, textOnly } from "@lens-protocol/metadata"
 import { post } from "@lens-protocol/client/actions"
-import { handleOperationWith } from "@lens-protocol/client/ethers"
 import { useAtom } from "jotai"
 import { userAtom } from "@/store/authState"
 import { useRouter } from "next/navigation"
