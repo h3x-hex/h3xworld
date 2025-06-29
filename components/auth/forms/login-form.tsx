@@ -25,7 +25,7 @@ const LoginForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
-  const [user, setUser] = useAtom(userAtom);
+  const [, setUser] = useAtom(userAtom);
 
   const router = useRouter();
 
