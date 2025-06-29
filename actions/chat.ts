@@ -78,3 +78,15 @@ export const getChatMessages = async (chatId: string) => {
     return []
   }
 }
+
+export const getChatById = async (id: string) => {
+  try {
+    const chat = await prisma.chat.findUnique({
+      where: { id },
+    })
+    return chat
+  } catch (error) {
+    console.log(error)
+    return null
+  }
+}
