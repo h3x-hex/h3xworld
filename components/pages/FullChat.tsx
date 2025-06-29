@@ -10,7 +10,12 @@ interface Message {
   timestamp: string
 }
 
-export default function FullChat() {
+interface FullChatProps {
+  chatId: string
+}
+
+
+export default function FullChat({ chatId }: FullChatProps) {
     const fullName = 'Ronald Prithiv'
   const username = 'Ronald'
   const [messages, setMessages] = useState<Message[]>([
