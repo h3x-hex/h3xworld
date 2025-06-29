@@ -1,7 +1,8 @@
 // components/ChatSection.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getChatsForUser } from '@/actions/chat'
 import BottomNav from '../nav/BottomNav';
 import { useRouter } from 'next/navigation';
 import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
@@ -72,14 +73,29 @@ export default ChatSection;
 // Placeholder Components (You'd replace these with real implementations)
 // File: components/sections/DMList.tsx
 export const DMs: React.FC = () => {
+  const [user] = useAtom(userAtom)
+  const [chats, setChats] = useState<any[]>([])
+
+  useEffect(() => {
+    async function loadChats() {
+      const data = await getChatsForUser(user.id)
+      setChats(data)
+    }
+    if (user.id) loadChats()
+  }, [user.id])
+
   return (
-    <div className="text-white p-4">
+    <div className="text-white p-4 space-y-3">
       <h2 className="text-xl font-bold mb-2">Direct Messages</h2>
-      {/* Replace with actual DMs UI */}
-      <p>No messages yet.</p>
+      {chats.length === 0 && <p>No messages yet.</p>}
+      {chats.map((chat) => (
+        <div key={chat.id} className="border-b border-gray-700 pb-2">
+          <a href={`/chats/${chat.id}`}>Chat {chat.id}</a>
+        </div>
+      ))}
     </div>
-  );
-};
+  )
+}
 
 // File: components/sections/PaidDMList.tsx
 export const PaidDMs: React.FC = () => {
