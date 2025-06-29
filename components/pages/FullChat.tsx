@@ -10,7 +10,7 @@ interface Message {
   id: string
   sender: string
   content: string
-  timestamp: string
+  timestamp: Date
 }
 
 export default function FullChat() {
@@ -79,7 +79,7 @@ export default function FullChat() {
                 msg.sender === 'me'
                   ? 'text-black'
                   : 'text-white'
-              }`}>{msg.timestamp}</span>
+              }`}></span>
             </div>
           </div>
         ))}
