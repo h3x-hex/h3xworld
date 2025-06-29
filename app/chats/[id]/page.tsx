@@ -1,11 +1,11 @@
 import FullChat from '@/components/pages/FullChat'
 import React from 'react'
 
-interface PageProps {
+interface ChatRouteParams  {
   params: { id: string }
 }
 
-const ChatPage = ({ params }: PageProps) => {
+const ChatPage = ({ params }: ChatRouteParams ) => {
   return (
     <div>
       <FullChat chatId={params.id} />
