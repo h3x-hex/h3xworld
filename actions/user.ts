@@ -45,7 +45,7 @@ interface onboardPayload  {
 
 export const onboardUser = async (onboardPayload: onboardPayload) => {
 
-  console.log('Onboardiung ')
+  console.log('Onboarding')
   try {
     const existingUser = await getUserByEmail(onboardPayload.email)
 
