@@ -78,9 +78,10 @@ const LoginForm = () => {
         return;
       }
       console.log(success);
-      setUser(res.success!);
+      const currentUser = res.success!;
+      setUser(currentUser);
 
-      const wallet = await ethers.Wallet.fromEncryptedJson(user.wallet!, user.pin!);
+      const wallet = await ethers.Wallet.fromEncryptedJson(currentUser.wallet!, currentUser.pin!);
       const provider = new ethers.JsonRpcProvider('https://shape-mainnet.g.alchemy.com/v2/xo6V5kULZHRCwGEuinRFYq_8Ma4rD8Mx');
       const signer = wallet.connect(provider);
       
@@ -88,7 +89,7 @@ const LoginForm = () => {
       
       const authenticated = await client.login({
         accountOwner: {
-          account: user.accountAddress,
+          account: currentUser.accountAddress,
           app: "0xa4de8E77b3F92005C84ff4dDd184b1F097aF11a2",
           owner: wallet.address,
         },
@@ -107,7 +108,7 @@ const LoginForm = () => {
 
       const result = await fetchAccount(client, {
         username: {
-          localName: user.username!,
+          localName: currentUser.username!,
           namespace: evmAddress("0x0c978F29b462762A1b64e10E0c7052353E743a2e"), // the Username namespace address
         },
       });
@@ -120,7 +121,16 @@ const LoginForm = () => {
 
       const socialLinksArray: SocialLink[] = Object.entries(JSON.parse(account?.metadata?.attributes[7].value!)).map(([platform, url]) => ({ platform, url } as SocialLink));
         
-      setUser({...user, bio: account?.metadata?.bio!, dob: account?.metadata?.attributes[1].value , location: account?.metadata?.attributes[2].value, occupation: account?.metadata?.attributes[3].value, socialLinks: socialLinksArray, profileImage: account?.metadata?.picture, coverImage: account?.metadata?.coverPicture})
+      setUser({
+        ...currentUser,
+        bio: account?.metadata?.bio!,
+        dob: account?.metadata?.attributes[1].value,
+        location: account?.metadata?.attributes[2].value,
+        occupation: account?.metadata?.attributes[3].value,
+        socialLinks: socialLinksArray,
+        profileImage: account?.metadata?.picture,
+        coverImage: account?.metadata?.coverPicture,
+      })
       setSuccess("User Logged In");
       console.log(res.success);
       setLoading(false);
