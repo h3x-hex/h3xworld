@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { XMarkIcon, ChevronLeftIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 
 type User = {
   name: string;
