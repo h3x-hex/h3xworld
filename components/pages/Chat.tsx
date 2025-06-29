@@ -9,13 +9,15 @@ import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
 import { useAtom } from 'jotai';
 import { userAtom } from '@/store/authState';
 import { whiteColor } from '@/constants/colors';
+import NewMessageModal from '../modals/NewMessageModal';
 
 
 const TABS = ['DMs', 'Paid DMs', 'Colab Requests', 'Gigs'];
 
 const ChatSection = () => {
+  
   const [activeTab, setActiveTab] = useState('DMs');
-
+  const [isModalOpen, setModalOpen] = useState(false);
   const [user] = useAtom(userAtom)
 
   const router = useRouter();
@@ -47,6 +49,8 @@ const ChatSection = () => {
           <input type="search" required placeholder="Search" className='text-gray-300'/>
         </label>
       </div>
+      <NewMessageModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+
       <div className="flex flex-row justify-around border-b border-gray-700 py-2 text-white">
         
         {TABS.map(tab => (
