@@ -3,36 +3,45 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { ChevronLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
+import { getChatMessages, sendMessage as sendChatMessage } from '@/actions/chat'
 
 interface Message {
-  sender: 'me' | 'other'
+  id: string
+  sender: string
   content: string
   timestamp: string
 }
 
-export default function FullChat() {
-    const fullName = 'Ronald Prithiv'
+interface FullChatProps {
+  chatId: string
+}
+
+export default function FullChat({ chatId }: FullChatProps) {
+  const fullName = 'Ronald Prithiv'
   const username = 'Ronald'
-  const [messages, setMessages] = useState<Message[]>([
-    { sender: 'other', content: 'Hey! How are you?', timestamp: '10:01 AM' },
-    { sender: 'me', content: 'All good! You?', timestamp: '10:02 AM' },
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [newMessage, setNewMessage] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    async function loadMessages() {
+      const data = await getChatMessages(chatId)
+      setMessages(data)
+    }
+    loadMessages()
+  }, [chatId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const sendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() === '') return
-    const newMsg: Message = {
-      sender: 'me',
-      content: newMessage.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    const created = await sendChatMessage(chatId, 'me', newMessage.trim())
+    if (created) {
+      setMessages((prev) => [...prev, created])
+      setNewMessage('')
     }
-    setMessages((prev) => [...prev, newMsg])
-    setNewMessage('')
   }
 
   return (
@@ -82,12 +91,12 @@ export default function FullChat() {
         <input
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
           className="flex-1 bg-transparent border border-gray-700 rounded-full px-4 py-2 text-sm outline-none focus:border-yellow-500 h-12"
           placeholder="Type your message..."
         />
         <button
-          onClick={sendMessage}
+          onClick={handleSendMessage}
           className="ml-3 text-yellow-500 hover:text-yellow-400 transition"
         >
           <PaperAirplaneIcon className="w-6 h-6 -rotate-45" />

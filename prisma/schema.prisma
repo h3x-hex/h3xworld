@@ -49,8 +49,13 @@ model Booking {
 }
 
 model Chat {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   participants String[] // Array of user IDs or addresses
+  type        ChatType  @default(DM)
+  isGroup     Boolean   @default(false)
+  name        String?
+  price       Float?
+  gigId       String?
 }
 
 model Message {
@@ -59,6 +64,31 @@ model Message {
   sender    String
   content   String
   timestamp DateTime @default(now())
+}
+
+model CallSession {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId    String
+  type      CallType
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  participants String[]
+}
+
+model ColabRequest {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId    String
+  requester String
+  status    RequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+}
+
+model PaidDM {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId  String
+  price   Float
+  payerId String?
+  paidAt  DateTime?
 }
 
 
@@ -87,6 +117,27 @@ model VerificationToken {
   expires DateTime
 
   @@unique([email, token])
+}
+
+enum ChatType {
+  DM
+  GROUP
+  VOICE
+  VIDEO
+  COLAB
+  PAID
+  GIG
+}
+
+enum CallType {
+  VOICE
+  VIDEO
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 

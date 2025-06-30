@@ -4,6 +4,7 @@ import { ChatBubbleOvalLeftEllipsisIcon as ChatSolidIcon, Cog6ToothIcon as CogSo
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import useNavigation from '@/hooks/useNavigation'
+import SearchBar from '../SearchBar'
 
 const Navbar = () => {
 
@@ -23,11 +24,8 @@ const Navbar = () => {
             <Image src={'/logo.png'} width={36} height={24} alt='h3x Logo'/>
           </div>
         </div>
-        <div className='navbar-center'>
-          <label className="input rounded-full bg-transparent border-gray-300 focus:border-yellow-500 border-[1px]">
-            <svg className="h-[1em] opacity-50 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></g></svg>
-            <input type="search" required placeholder="Search" className='text-gray-300'/>
-          </label>
+        <div className='navbar-center w-64'>
+          <SearchBar />
         </div>
         <div className="navbar-end">
           <div role="button" className="bg-transparent border-none shadow-none pr-3">
