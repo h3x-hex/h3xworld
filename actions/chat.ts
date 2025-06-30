@@ -90,3 +90,23 @@ export const getChatById = async (id: string) => {
     return null
   }
 }
+
+export const getChatBetweenUsers = async (
+  userId1: string,
+  userId2: string,
+) => {
+  try {
+    const chat = await prisma.chat.findFirst({
+      where: {
+        isGroup: false,
+        participants: {
+          hasEvery: [userId1, userId2],
+        },
+      },
+    })
+    return chat
+  } catch (error) {
+    console.log(error)
+    return null
+  }
+}
