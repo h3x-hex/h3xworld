@@ -4,7 +4,7 @@ import React from 'react'
 const ChatPage = () => {
   return (
     <div>
-      <FullChat/>
+      <FullChat />
     </div>
   )
 }

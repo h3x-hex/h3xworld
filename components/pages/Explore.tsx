@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import SearchBar from '../SearchBar'
 import BottomNav from '@/components/nav/BottomNav'
 import Navbar from '@/components/nav/Navbar'
 import MediaQuery from 'react-responsive'
@@ -28,21 +29,9 @@ const Explore = () => {
                     <motion.div variants={tabVariants} initial="hidden" animate="visible" className="flex flex-col space-y-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-2xl font-bold text-yellow-400">Explore</h2>
-                            <label className="input input-bordered border-2 focus:border-2 focus:border-yellow-500 bg-transparent rounded-full text-white w-2/3 mx-auto">
-                                <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                    <g
-                                    strokeLinejoin="round"
-                                    strokeLinecap="round"
-                                    strokeWidth="2.5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    >
-                                        <circle cx="11" cy="11" r="8"></circle>
-                                        <path d="m21 21-4.3-4.3"></path>
-                                    </g>
-                                </svg>
-                                <input type="search" required placeholder="Search" />
-                            </label>
+                            <div className="w-2/3 mx-auto">
+                              <SearchBar />
+                            </div>
                         </div>
                         <div className="flex flex-col pl-84 gap-8">
                             <div className='flex flex-col'>

@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { getChatsForUser } from '@/actions/chat'
+import SearchBar from '../SearchBar'
 import BottomNav from '../nav/BottomNav';
 import { useRouter } from 'next/navigation';
 import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
@@ -43,11 +44,8 @@ const ChatSection = () => {
         </div>
         <PencilSquareIcon width={32} color={whiteColor} className='cursor-pointer pt-2' onClick={() => setModalOpen(true)}/>
       </div>
-      <div className='flex w-full pt-3'>
-        <label className="input rounded-full bg-transparent border-gray-300 focus:border-yellow-500 border-[1px] w-[90%] mx-auto">
-          <svg className="h-[1em] opacity-50 text-gray-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></g></svg>
-          <input type="search" required placeholder="Search" className='text-gray-300'/>
-        </label>
+      <div className='flex w-full pt-3 px-4'>
+        <SearchBar />
       </div>
       <NewMessageModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
 

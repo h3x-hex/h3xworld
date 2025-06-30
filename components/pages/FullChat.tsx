@@ -2,9 +2,9 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'next/navigation';
 import { ChevronLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
 import { getChatMessages, sendMessage as sendChatMessage } from '@/actions/chat'
+import { useParams } from 'next/navigation'
 
 interface Message {
   id: string
@@ -14,9 +14,8 @@ interface Message {
 }
 
 export default function FullChat() {
-
-  const { id } = useParams();
-
+  const params = useParams<{ id: string }>()
+  const chatId = Array.isArray(params?.id) ? params.id[0] : params?.id as string
   const fullName = 'Ronald Prithiv'
   const username = 'Ronald'
   const [messages, setMessages] = useState<Message[]>([])
@@ -25,11 +24,11 @@ export default function FullChat() {
 
   useEffect(() => {
     async function loadMessages() {
-      const data = await getChatMessages(id as string)
-      setMessages(data)
-    }
-    loadMessages()
-  }, [])
+      const data = await getChatMessages(chatId)
+          setMessages(data)
+        }
+      loadMessages()
+    }, [chatId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -37,7 +36,8 @@ export default function FullChat() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim() === '') return
-    const created = await sendChatMessage(id as string, 'me', newMessage.trim())
+      const created = await sendChatMessage(chatId, 'me', newMessage.trim())
+
     if (created) {
       setMessages((prev) => [...prev, created])
       setNewMessage('')
