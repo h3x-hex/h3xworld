@@ -23,7 +23,7 @@ const Navbar = () => {
           <SearchBar />
         </div>
         <div className="navbar-end">
-          <div role="button" className="bg-transparent border-none shadow-none pr-3">
+          <div role="button" className="bg-transparent border-none shadow-none pl-2 pr-2">
             <div className="w-8 rounded-full font-semibold">
               {
                 !isChatActive ?
@@ -35,7 +35,7 @@ const Navbar = () => {
           </div>
           {
             isProfileActive ?
-            <div role="button" className="bg-transparent border-none shadow-none pr-3">
+            <div role="button" className="bg-transparent border-none shadow-none pr-1">
               <div className="w-8 rounded-full font-semibold">
                 {
                   !isSettingsActive ?

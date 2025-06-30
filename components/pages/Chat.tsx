@@ -47,7 +47,15 @@ const ChatSection = () => {
       <div className='flex w-full pt-3 px-4'>
         <SearchBar />
       </div>
-      <NewMessageModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      { 
+        isModalOpen ?
+
+          <NewMessageModal onClose={() => setModalOpen(false)} />
+
+          :
+          
+          <></>  
+      }
 
       <div className="flex flex-row justify-around border-b border-gray-700 py-2 text-white">
         

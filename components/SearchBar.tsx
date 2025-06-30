@@ -5,6 +5,7 @@ import { searchUsers } from '@/actions/search'
 
 const SearchBar: React.FC = () => {
   const [query, setQuery] = useState('')
+  const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[]>([])
 
   useEffect(() => {
@@ -13,7 +14,10 @@ const SearchBar: React.FC = () => {
         setResults([])
         return
       }
+      setIsLoading(true)
       const data = await searchUsers(query.trim())
+      setIsLoading(false)
+      console.log(data)
       setResults(data)
     }, 300)
 
@@ -37,15 +41,24 @@ const SearchBar: React.FC = () => {
           onChange={e => setQuery(e.target.value)}
         />
       </label>
-      {results.length > 0 && (
-        <ul className="absolute z-10 w-full mt-1 bg-stone-900 border border-gray-700 rounded-md text-gray-300 max-h-60 overflow-y-auto">
-          {results.map(user => (
-            <li key={user.id} className="p-2 hover:bg-stone-800">
-              <a href={`/${user.username}`}>{user.username || user.name}</a>
-            </li>
-          ))}
-        </ul>
-      )}
+      {
+          isLoading ?
+
+          <span className="loading loading-spinner text-warning"></span>
+
+          :
+
+          results.length > 0 && (
+            <ul className="absolute z-10 w-full mt-1 bg-stone-900 border border-gray-700 rounded-md text-gray-300 max-h-60 overflow-y-auto">
+              {results.map(user => (
+                <li key={user.id} className="p-2 hover:bg-stone-800">
+                  <a href={`/${user.username}`}>{user.username || user.name}</a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      
     </div>
   )
 }
