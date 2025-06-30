@@ -2,7 +2,6 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams } from 'next/navigation';
 import { ChevronLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
 import { getChatMessages, sendMessage as sendChatMessage } from '@/actions/chat'
 import { useParams } from 'next/navigation'
