@@ -2,6 +2,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react'
+import { useParams } from 'next/navigation';
 import { ChevronLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
 import { getChatMessages, sendMessage as sendChatMessage } from '@/actions/chat'
 import { useParams } from 'next/navigation'
@@ -10,7 +11,7 @@ interface Message {
   id: string
   sender: string
   content: string
-  timestamp: string
+  timestamp: Date
 }
 
 export default function FullChat() {
@@ -25,10 +26,10 @@ export default function FullChat() {
   useEffect(() => {
     async function loadMessages() {
       const data = await getChatMessages(chatId)
-      setMessages(data)
-    }
-    loadMessages()
-  }, [chatId])
+          setMessages(data)
+        }
+      loadMessages()
+    }, [chatId])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -36,7 +37,8 @@ export default function FullChat() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim() === '') return
-    const created = await sendChatMessage(chatId, 'me', newMessage.trim())
+      const created = await sendChatMessage(chatId, 'me', newMessage.trim())
+
     if (created) {
       setMessages((prev) => [...prev, created])
       setNewMessage('')
@@ -78,7 +80,7 @@ export default function FullChat() {
                 msg.sender === 'me'
                   ? 'text-black'
                   : 'text-white'
-              }`}>{msg.timestamp}</span>
+              }`}></span>
             </div>
           </div>
         ))}

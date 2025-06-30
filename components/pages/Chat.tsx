@@ -10,13 +10,15 @@ import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
 import { useAtom } from 'jotai';
 import { userAtom } from '@/store/authState';
 import { whiteColor } from '@/constants/colors';
+import NewMessageModal from '../modals/NewMessageModal';
 
 
 const TABS = ['DMs', 'Paid DMs', 'Colab Requests', 'Gigs'];
 
 const ChatSection = () => {
-  const [activeTab, setActiveTab] = useState('DMs');
 
+  const [activeTab, setActiveTab] = useState('DMs');
+  const [isModalOpen, setModalOpen] = useState(false);
   const [user] = useAtom(userAtom)
 
   const router = useRouter();
@@ -40,11 +42,13 @@ const ChatSection = () => {
           <ChevronLeftIcon width={24} color={whiteColor} className='cursor-pointer pt-2' onClick={() => router.back()} />
           <h1 className='text-white text-2xl font-bold'>{user.username}</h1>
         </div>
-        <PencilSquareIcon width={32} color={whiteColor} className='cursor-pointer pt-2'/>
+        <PencilSquareIcon width={32} color={whiteColor} className='cursor-pointer pt-2' onClick={() => setModalOpen(true)}/>
       </div>
       <div className='flex w-full pt-3 px-4'>
         <SearchBar />
       </div>
+      <NewMessageModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+
       <div className="flex flex-row justify-around border-b border-gray-700 py-2 text-white">
         
         {TABS.map(tab => (

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import './globalicons.css';
-import ClientRecoilProvider from "@/components/ClientRecoilProvider";
+import ClientJotaiProvider from "@/components/ClientJotaiProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-stone-950`}
       >
-        <ClientRecoilProvider>
+        <ClientJotaiProvider>
           {children}
-        </ClientRecoilProvider>
+        </ClientJotaiProvider>
       </body>
     </html>
   );
