@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { ChevronLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline'
 import { getChatMessages, sendMessage as sendChatMessage } from '@/actions/chat'
+import { useParams } from 'next/navigation'
 
 interface Message {
   id: string
@@ -12,11 +13,9 @@ interface Message {
   timestamp: string
 }
 
-interface FullChatProps {
-  chatId: string
-}
-
-export default function FullChat({ chatId }: FullChatProps) {
+export default function FullChat() {
+  const params = useParams<{ id: string }>()
+  const chatId = Array.isArray(params?.id) ? params.id[0] : params?.id as string
   const fullName = 'Ronald Prithiv'
   const username = 'Ronald'
   const [messages, setMessages] = useState<Message[]>([])

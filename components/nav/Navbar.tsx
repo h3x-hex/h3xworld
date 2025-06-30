@@ -7,14 +7,9 @@ import useNavigation from '@/hooks/useNavigation'
 import SearchBar from '../SearchBar'
 
 const Navbar = () => {
+  const router = useRouter()
 
-  const router = useRouter();
-  
-  const {
-      isChatActive,
-      isSettingsActive,
-      isProfileActive
-  } = useNavigation();
+  const { isChatActive, isSettingsActive, isProfileActive } = useNavigation()
 
   return (
     <div className='bg-stone-950'>
@@ -32,33 +27,22 @@ const Navbar = () => {
             <div className="w-8 rounded-full font-semibold">
               {
                 !isChatActive ?
-
                 <ChatBubbleOvalLeftEllipsisIcon color='white' onClick={() => router.push('/chats')}/>
-
                 :
-
                 <ChatSolidIcon color='#F0B100'/>
-
               }
-              
             </div>
           </div>
           {
             isProfileActive ?
-
             <div role="button" className="bg-transparent border-none shadow-none pr-3">
               <div className="w-8 rounded-full font-semibold">
                 {
                   !isSettingsActive ?
-
                   <Cog6ToothIcon color='white' onClick={() => router.push('/settings')}/>
-
                   :
-
                   <CogSolidIcon color='#F0B100'/>
-
                 }
-                
               </div>
             </div>
             :
@@ -66,7 +50,6 @@ const Navbar = () => {
           }
         </div>
       </div>
-
     </div>
   )
 }
