@@ -41,21 +41,6 @@ const HomeFeed: React.FC<HomeFeedProps> = ({ user }) => {
   const [posts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { data, loading, error } = usePostsForYou({
-      account: evmAddress(user.accountAddress!),
-      shuffle: true, // optional, shuffle the results
-  });
-
-  if (loading) {
-    return <p>Loading…</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  console.log(data.items)
-
   useEffect(() => {
     const loadPosts = async () => {
       if (!user.accountAddress) return;
@@ -71,6 +56,22 @@ const HomeFeed: React.FC<HomeFeedProps> = ({ user }) => {
 
     loadPosts();
   }, [user.accountAddress]);
+
+  const { data, loading, error } = usePostsForYou({
+      account: evmAddress(user.accountAddress!),
+      shuffle: true, // optional, shuffle the results
+  });
+
+  if (loading) {
+    return <p>Loading…</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  console.log(data.items)
+
 
   return (
     <>
