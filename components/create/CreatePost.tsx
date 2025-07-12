@@ -1,6 +1,6 @@
 'use client'
 
-import { InformationCircleIcon, PhotoIcon, GifIcon, FaceSmileIcon } from '@heroicons/react/24/outline'
+import { InformationCircleIcon, PhotoIcon, GifIcon } from '@heroicons/react/24/outline'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/navigation'
@@ -19,7 +19,6 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css'
 import { useAtom } from 'jotai'
 import { userAtom } from '@/store/authState'
 import GifPicker from "../posts/GifPicker"
-import EmojiPicker from 'emoji-picker-react'
 import { MAX_FILE_SIZE_MB, MAX_FILE_SIZE_BYTES } from '@/constants/constants'
 import { goldColor } from "@/constants/colors"
 import Modal from '@/components/Modal'
@@ -57,7 +56,6 @@ export default function CreatePost() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [selectedDest, setSelectedDest] = useState<string[]>([])
   const [showGifPicker, setShowGifPicker] = useState(false)
-  const [showPicker, setShowPicker] = useState(false)
   const [destinationData, setDestinationData] = useState<DestinationState>({
     portfolio: '',
     club: null,
@@ -112,8 +110,12 @@ export default function CreatePost() {
       url: URL.createObjectURL(file),
       type: file.type.startsWith('video') ? 'video' : 'image'
     }))
-
-    setMedia(prev => [...prev, ...newMedia])
+    
+    setMedia(prev => {
+      const updated = [...prev, ...newMedia];
+      setCurrentSlide(updated.length - 1); // Move to new last slide
+      return updated;
+    });    
     setUpgradePrompt(false)
   }, [])
 
@@ -143,14 +145,16 @@ export default function CreatePost() {
       if (fileToRemove) {
         URL.revokeObjectURL(fileToRemove.url)
       }
-      
+      if (fileToRemove?.file) {
+        URL.revokeObjectURL(fileToRemove.url)
+      }
+
       const newFiles = prev.filter((_, i) => i !== index)
       
-      if (currentSlide >= newFiles.length && newFiles.length > 0) {
-        setCurrentSlide(newFiles.length - 1)
-      } else if (newFiles.length === 0) {
-        setCurrentSlide(0)
-      }
+      setCurrentSlide((prevSlide) => {
+        if (newFiles.length === 0) return 0;
+        return Math.min(prevSlide, newFiles.length - 1);
+      });
       
       return newFiles
     })
@@ -394,6 +398,7 @@ export default function CreatePost() {
         {media.length > 0 && (
           <div className="mb-6">
             <Carousel
+              key={media.length} // <--- add this
               selectedItem={currentSlide}
               onChange={setCurrentSlide}
               showThumbs={false}
@@ -403,7 +408,7 @@ export default function CreatePost() {
               dynamicHeight={false}
               className="rounded-lg overflow-hidden border-2 border-gray-600"
             >
-              {media.map(({ file, url }, idx) => (
+              {media.map(({ file, url, type }, idx) => (
                 <div key={url} className="relative h-64 sm:h-96">
                   {file && file.type.startsWith('video') ? (
                     <video 
@@ -412,14 +417,23 @@ export default function CreatePost() {
                       className="w-full h-full object-cover" 
                       preload="metadata"
                     />
+                  ) : 
+                  file === null && type === 'GIF' ? (
+                    <img
+                      src={url}
+                      className="w-full h-full object-contain bg-black"
+                      alt={`GIF Preview ${idx + 1}`}
+                      loading="lazy"
+                    />
                   ) : (
-                    <img 
-                      src={url} 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src={url}
+                      className="w-full h-full object-cover"
                       alt={`Preview ${idx + 1}`}
                       loading="lazy"
                     />
-                  )}
+                  )
+                  }
                   <button
                     onClick={() => removeFile(idx)}
                     className="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 text-white hover:bg-opacity-90 transition-opacity"
@@ -441,7 +455,6 @@ export default function CreatePost() {
           <input ref={inputRef} type="file" accept="image/*,video/*" multiple onChange={(e) => handleFileChange(e)} className='hidden'/>
           <PhotoIcon className='cursor-pointer' width={36} color={goldColor} onClick={() => inputRef.current?.click()}/>
           <GifIcon className="cursor-pointer" width={36} color={goldColor} onClick={() => setShowGifPicker(true)}/>
-          <FaceSmileIcon className="h-5 w-5 cursor-pointer hover:text-white" color={goldColor} onClick={() => setShowPicker(!showPicker)}/>
         </div>
 
         {/* Upgrade Prompt */}
@@ -620,15 +633,16 @@ export default function CreatePost() {
         {showGifPicker && (
           <GifPicker
             apiKey={process.env.NEXT_PUBLIC_GIPHY_API_KEY!}
-            onSelect={(url) => setMedia((m) => [...m, {file: null, url:url, type: 'GIF'}])}
+            onSelect={(url) => {
+              setMedia(prev => {
+                const updated = [...prev, { file: null, url, type: 'GIF' }];
+                setCurrentSlide(updated.length - 1); // Move to the new GIF
+                return updated;
+              });
+              setShowGifPicker(false);
+            }}
             onClose={() => setShowGifPicker(false)}
           />
-        )}
-
-        {showPicker && (
-          <div className="absolute z-50 mt-2">
-            <EmojiPicker onEmojiClick={(emojiObject) => setContent(prev => prev + emojiObject.emoji)} />
-          </div>
         )}
 
         {/* Modals */}

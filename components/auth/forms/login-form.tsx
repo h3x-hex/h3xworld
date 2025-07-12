@@ -119,7 +119,7 @@ const LoginForm = () => {
       
       const account = result.value;
 
-      const socialLinksArray: SocialLink[] = Object.entries(JSON.parse(account?.metadata?.attributes[7].value!)).map(([platform, url]) => ({ platform, url } as SocialLink));
+      const socialLinksArray: SocialLink[] = Object.entries(JSON.parse(account?.metadata?.attributes[6].value!)).map(([platform, url]) => ({ platform, url } as SocialLink));
         
       setUser({
         ...currentUser,

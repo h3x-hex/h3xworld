@@ -5,15 +5,15 @@ import moment from 'moment'
 import { Post, postId, PostReactionType } from '@lens-protocol/client'
 import {
   ArrowPathRoundedSquareIcon,
-  BookmarkIcon,
+  ChartBarSquareIcon,
   ChatBubbleLeftEllipsisIcon,
+  CurrencyDollarIcon,
   EllipsisHorizontalIcon,
   HeartIcon,
   PencilIcon,
 } from '@heroicons/react/24/outline'
 import {
   HeartIcon as HeartSolid,
-  BookmarkIcon as BookmarkSolid,
 } from '@heroicons/react/24/solid'
 import { addReaction, bookmarkPost, repost, undoReaction } from "@lens-protocol/client/actions";
 import { Carousel } from 'react-responsive-carousel'
@@ -29,9 +29,10 @@ import { goldColor, greyColor, whiteColor } from '@/constants/colors'
 
 interface PostCardProps {
   postItem: Post
+  gridView? : boolean
 }
 
-const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
+const PostCard: React.FC<PostCardProps> = ({ postItem, gridView }) => {
   const timestamp = postItem.timestamp
     ? moment(postItem.timestamp).fromNow()
     : 'just now'
@@ -221,179 +222,234 @@ const PostCard: React.FC<PostCardProps> = ({ postItem }) => {
   }
   
   return (
-    <div className="bg-black py-4 text-white border-b border-yellow-500 relative">
-      <div onClick={handleCardClick} className='z-0'>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-3">
-            <img
-              src={postItem.author.metadata?.picture}
-              alt="avatar"
-              className="w-12 h-12 rounded-full border border-yellow-400"
-            />
-            <div>
-              <div className="flex flex-row gap-2">
-                <p className="font-semibold">{postItem.author.metadata?.name}</p>
-                <p className="text-gray-400">{timestamp}</p>
-                <button
-                  onClick={handleOpenMenu}
-                  className="hover:bg-stone-700 rounded-full right-4 absolute"
-                >
-                  <EllipsisHorizontalIcon className="w-6 text-white" />
-                </button>
-              </div>
-              <p className="text-gray-400">@{postItem.author.username?.localName || postItem.author.metadata?.name}</p>
-            </div>
-          </div>
+    <>
+      {
+        !gridView ?
 
-          
-        </div>
-
-        <div className='pl-[3.75rem]'>
-          {postItem.metadata.__typename === 'ImageMetadata' && (
-            <h2 className="text-md mb-2">{postItem.metadata?.title}</h2>
-          )}
-
-          <p className="text-md text-gray-300 py-3">
-            {postItem.metadata.__typename === "TextOnlyMetadata" ? postItem.metadata.content : <></>}
-          </p>
-
-          {postItem.metadata.__typename === "ImageMetadata" && media.length > 0 && (
-            <div onClick={(e) => e.stopPropagation()}>
-              <Carousel
-                showThumbs={false}
-                showStatus={false}
-                infiniteLoop
-                useKeyboardArrows
-                showIndicators
-                className="rounded-md overflow-hidden h-64 sm:h-96 mb-4 border border-gray-700 cursor-pointer"
-                onClickItem={(index) => {
-                  setCurrentSlide(index)
-                  setModalOpen(true)
-                }}
-              >
-                {media.map((url, idx) => (
-                  <div key={idx} className="relative w-full">
-                    <img
-                      src={url}
-                      className="object-cover rounded-lg h-64 sm:h-96 w-full cursor-pointer"
-                      alt={`media-${idx}`}
-                    />
+        <div className="bg-stone-950 py-4 text-white border-b border-yellow-500 relative">
+          <div onClick={handleCardClick} className='z-0 pb-2'>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3 pl-2">
+                <img
+                  src={postItem.author.metadata?.picture}
+                  alt="avatar"
+                  className="w-12 h-12 rounded-full border border-yellow-400"
+                />
+                <div>
+                  <div className="flex flex-row gap-2 pl-1">
+                    <p className="font-semibold">{postItem.author.metadata?.name}</p>
+                    <p className="text-gray-400">{timestamp}</p>
+                    <button
+                      onClick={handleOpenMenu}
+                      className="hover:bg-stone-700 rounded-full right-3 absolute"
+                    >
+                      <EllipsisHorizontalIcon className="w-6 text-white" />
+                    </button>
                   </div>
-                ))}
-              </Carousel>
+                  <p className="text-gray-400 pl-1">@{postItem.author.username?.localName || postItem.author.metadata?.name}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className='pl-[3.75rem]'>
+              {postItem.metadata.__typename === 'ImageMetadata' && (
+                <h2 className="text-md mb-2 pl-3">{postItem.metadata?.title}</h2>
+              )}
+
+              <p className="text-md text-gray-300 py-1 pl-3">
+                {postItem.metadata.__typename === "TextOnlyMetadata" ? postItem.metadata.content : <></>}
+              </p>
+
+              {postItem.metadata.__typename === "ImageMetadata" && media.length > 0 && (
+                <div onClick={(e) => e.stopPropagation()} className='pl-3'>
+                  <Carousel
+                    showThumbs={false}
+                    showStatus={false}
+                    infiniteLoop
+                    useKeyboardArrows
+                    showIndicators
+                    className="rounded-md overflow-hidden h-84 w-84 sm:h-[32rem] sm:w-[32rem] mb-4 border border-gray-700 cursor-pointer"
+                    onClickItem={(index) => {
+                      setCurrentSlide(index)
+                      setModalOpen(true)
+                    }}
+                  >
+                    {media.map((url, idx) => (
+                      <div key={idx} className="relative w-full">
+                        <img
+                          src={url}
+                          className="object-cover rounded-lg h-84 w-84 sm:h-[32rem] sm:w-[32rem] w-full cursor-pointer"
+                          alt={`media-${idx}`}
+                        />
+                      </div>
+                    ))}
+                  </Carousel>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {modalOpen && (
+            <ImageModal
+              media={media}
+              startIndex={currentSlide}
+              onClose={() => {
+                justClosedModalRef.current = true
+                setModalOpen(false)
+              }}
+            />
+          )}
+
+          <div className="flex flex-row gap-10 sm:gap-16 text-gray-400 text-sm pt-1 pl-18">
+            <button
+              onClick={() => postInteraction('like')}
+              className="flex items-center gap-2 hover:text-yellow-500 transition"
+            >
+              {liked ? <HeartSolid className='text-yellow-500' width={18} /> : <HeartIcon className='text-yellow-500' width={18} />}
+              {likes}
+            </button>
+
+            <button
+                onClick={() => postInteraction('comment')}
+                className="flex items-center gap-2 hover:text-yellow-500 transition"
+              >
+              <ChatBubbleLeftEllipsisIcon color="#D2D2D2" width={18} />
+              {comments}
+            </button>
+
+            <div className="dropdown">
+              <button
+                className={`flex items-center gap-2 transition ${
+                  reposted ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'
+                }`}
+                onClick={() => setDropDownOpen(true)}
+              >
+                { reposted ? <ArrowPathRoundedSquareIcon width={18} color={goldColor} strokeWidth={2.5} /> : <ArrowPathRoundedSquareIcon width={18} color={greyColor} strokeWidth={1} />}
+                {reposts + quotes}
+              </button>
+              {
+                dropdownOpen &&
+                <ul className="menu dropdown-content bg-stone-800 rounded-box z-1 w-36 p-2 shadow-sm text-white text-lg">
+                  <li className='flex flex-row z-10'><button onClick={() => {setDropDownOpen(false);postInteraction('repost')}}><ArrowPathRoundedSquareIcon width={18} color={whiteColor} strokeWidth={2} className='z-10'/>Repost</button></li>
+                  <li className='flex flex-row z-10'><button onClick={() => {setDropDownOpen(false);setIsQuoteOpen(true)}}><PencilIcon width={18} color={whiteColor} strokeWidth={2}/>Quote</button></li>
+                </ul>
+              }
+            </div>
+
+            <button
+              onClick={() => postInteraction('bookmark')}
+              className="flex items-center gap-2 hover:text-yellow-500 transition"
+            >
+              {bookmarked ? <CurrencyDollarIcon color={goldColor} width={18} /> : <CurrencyDollarIcon color={greyColor} width={18} />}
+              {bookmarks}
+            </button>
+
+            <button
+              onClick={() => postInteraction('bookmark')}
+              className="flex items-center gap-2 hover:text-yellow-500 transition"
+            >
+              {bookmarked ? <ChartBarSquareIcon color={goldColor} width={18} /> : <ChartBarSquareIcon color={greyColor} width={18} />}
+              {bookmarks}
+            </button>
+          </div>
+
+          <QuoteModal
+            isOpen={isQuoteOpen}
+            onClose={() => setIsQuoteOpen(false)}
+            quotedPost={postItem}
+            quotedPostMedia={media}
+          />
+
+          {/* Bottom Sheet Modal with Locked Background Scroll */}
+          {menuOpen && (
+            <div className="fixed inset-0 z-100 pointer-events-none h-screen">
+              {/* Top 25% overlay (dimmed, clickable to close) */}
+              <div
+                className="absolute top-0 left-0 w-full pointer-events-auto"
+                style={{ height: '25vh' }}
+                onClick={handleCloseMenu}
+              >
+                <div className="w-full h-full bg-transparent backdrop-blur-xs" />
+              </div>
+
+              {/* Bottom modal */}
+              <div
+                ref={menuRef}
+                className={`
+                  fixed bottom-0 left-1/2 transform -translate-x-1/2
+                  w-full sm:w-96 bg-stone-800 rounded-t-2xl
+                  transition-transform duration-300
+                  ${animateIn ? 'translate-y-0' : 'translate-y-full'}
+                  pointer-events-auto flex flex-col
+                `}
+                style={{ height: '75vh' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div
+                  className="flex justify-center py-3 border-b border-stone-700"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  <div className="w-12 h-1.5 bg-gray-500 rounded-full" />
+                </div>
+
+                <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+                  <button className="w-full text-left">Report postItem</button>
+                  <button className="w-full text-left">Mute User</button>
+                  <button className="w-full text-left">Block User</button>
+                  {/* Simulated scroll content */}
+                  <div className="h-96"></div>
+                </div>
+              </div>
             </div>
           )}
         </div>
-      </div>
-
-      {modalOpen && (
-        <ImageModal
-          media={media}
-          startIndex={currentSlide}
-          onClose={() => {
-            justClosedModalRef.current = true
-            setModalOpen(false)
-          }}
-        />
-      )}
-
-      <div className="flex justify-between text-gray-400 text-sm border-t border-stone-700 pt-3 pl-[3.75rem] pr-4">
-        <button
-          onClick={() => postInteraction('like')}
-          className="flex items-center gap-2 hover:text-yellow-500 transition"
-        >
-          {liked ? <HeartSolid color="#eab308" width={20} /> : <HeartIcon color="#D2D2D2" width={20} />}
-          {likes}
-        </button>
-
-        <button
-            onClick={() => postInteraction('comment')}
-            className="flex items-center gap-2 hover:text-yellow-500 transition"
-          >
-          <ChatBubbleLeftEllipsisIcon color="#D2D2D2" width={20} />
-          {comments}
-        </button>
-
-        <div className="dropdown">
-          <button
-            className={`flex items-center gap-2 transition ${
-              reposted ? 'font-bold text-yellow-500' : 'hover:text-yellow-500'
-            }`}
-            onClick={() => setDropDownOpen(true)}
-          >
-            { reposted ? <ArrowPathRoundedSquareIcon width={20} color={goldColor} strokeWidth={2.5} /> : <ArrowPathRoundedSquareIcon width={20} color={greyColor} strokeWidth={1} />}
-            {reposts + quotes}
-          </button>
-          {
-            dropdownOpen &&
-            <ul className="menu dropdown-content bg-stone-800 rounded-box z-1 w-36 p-2 shadow-sm text-white text-lg">
-              <li className='flex flex-row z-10'><button onClick={() => {setDropDownOpen(false);postInteraction('repost')}}><ArrowPathRoundedSquareIcon width={20} color={whiteColor} strokeWidth={2} className='z-10'/>Repost</button></li>
-              <li className='flex flex-row z-10'><button onClick={() => {setDropDownOpen(false);setIsQuoteOpen(true)}}><PencilIcon width={20} color={whiteColor} strokeWidth={2}/>Quote</button></li>
-            </ul>
-          }
-        </div>
-
-        <button
-          onClick={() => postInteraction('bookmark')}
-          className="flex items-center gap-2 hover:text-yellow-500 transition"
-        >
-          {bookmarked ? <BookmarkSolid color={goldColor} width={20} /> : <BookmarkIcon color={greyColor} width={20} />}
-          {bookmarks}
-        </button>
-      </div>
-
-      <QuoteModal
-        isOpen={isQuoteOpen}
-        onClose={() => setIsQuoteOpen(false)}
-        quotedPost={postItem}
-        quotedPostMedia={media}
-      />
-
-      {/* Bottom Sheet Modal with Locked Background Scroll */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-100 pointer-events-none h-screen">
-          {/* Top 25% overlay (dimmed, clickable to close) */}
-          <div
-            className="absolute top-0 left-0 w-full pointer-events-auto"
-            style={{ height: '25vh' }}
-            onClick={handleCloseMenu}
-          >
-            <div className="w-full h-full bg-transparent backdrop-blur-xs" />
-          </div>
-
-          {/* Bottom modal */}
-          <div
-            ref={menuRef}
-            className={`
-              fixed bottom-0 left-1/2 transform -translate-x-1/2
-              w-full sm:w-96 bg-stone-800 rounded-t-2xl
-              transition-transform duration-300
-              ${animateIn ? 'translate-y-0' : 'translate-y-full'}
-              pointer-events-auto flex flex-col
-            `}
-            style={{ height: '75vh' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              className="flex justify-center py-3 border-b border-stone-700"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              <div className="w-12 h-1.5 bg-gray-500 rounded-full" />
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
-              <button className="w-full text-left">Report postItem</button>
-              <button className="w-full text-left">Mute User</button>
-              <button className="w-full text-left">Block User</button>
-              {/* Simulated scroll content */}
-              <div className="h-96"></div>
-            </div>
+        :
+        <div className="bg-stone-950 h-48 text-white relative">
+          <div onClick={handleCardClick} className='z-0'>
+            <div className='h-48 w-48'>
+              {postItem.metadata.__typename === "ImageMetadata" && media.length > 0 && (
+                <div className='h-48 w-48' onClick={(e) => e.stopPropagation()}>
+                  <Carousel
+                    showThumbs={false}
+                    showStatus={false}
+                    infiniteLoop
+                    useKeyboardArrows
+                    showIndicators
+                    className="overflow-hidden h-48 w-48 cursor-pointer"
+                    onClickItem={(index) => {
+                      setCurrentSlide(index)
+                    }}
+                  >
+                    {media.map((url, idx) => (
+                      <div key={idx} className="relative">
+                        <img
+                          src={url}
+                          className="object-cover h-48 w-48 cursor-pointer"
+                          alt={`media-${idx}`}
+                        />
+                      </div>
+                    ))}
+                  </Carousel>
+                </div>
+              )}
           </div>
         </div>
-      )}
-    </div>
+
+        {modalOpen && (
+          <ImageModal
+            media={media}
+            startIndex={currentSlide}
+            onClose={() => {
+              justClosedModalRef.current = true
+              setModalOpen(false)
+            }}
+          />
+        )}
+      </div>
+      }
+    </>
   )
 }
 

@@ -88,20 +88,22 @@ const ShopGrid = ({address}: PostsFeedProps) => {
 
       :
 
-      <div className="bg-black min-h-screen text-white p-5">
+      <div className="bg-stone-950 min-h-screen text-white p-5">
         <h2 className="text-2xl font-bold text-yellow-500 mb-6 text-center">Shop</h2>
         <h3 className="text-lg font-semibold mb-2">Categories</h3>
         <div className="grid grid-cols-2 gap-4 mb-6">
-        {categoriesList.map((category) => (
+          {categoriesList.map((category) => (
             category.metadata.__typename === 'ImageMetadata' &&
 
-            <div key={category.metadata.title} className="bg-stone-900 rounded-xl border border-yellow-500 overflow-hidden shadow-sm hover:shadow-lg transition w-full p-1" onClick={() => router.push(`/shop/category/${category.id}?fromTab=Shop`)}>
-              <img
-                src={category.metadata.image.item}
-                alt={category.metadata.title!}
-                className="w-full h-36 object-contain"
-              />
-              <div className="p-3">
+            <div key={category.metadata.title} className="flex flex-col bg-stone-900 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition w-full" onClick={() => router.push(`/shop/category/${category.id}?fromTab=Shop`)}>
+              <div className='h-42 w-full'>
+                <img
+                  src={category.metadata.image.item}
+                  alt={category.metadata.title!}
+                  className="object-fit"
+                />
+              </div>
+              <div className="h-12 bg-stone-900 px-3 py-2">
                 <h2 className="text-lg font-semibold text-white">{category.metadata.title}</h2>
               </div>
             </div>
@@ -109,15 +111,15 @@ const ShopGrid = ({address}: PostsFeedProps) => {
         </div>
 
         <h3 className="text-lg font-semibold mb-2">Featured Products</h3>
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 mx-auto">
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 mx-auto">
           {productsList.map((product) => (
             product.metadata.__typename === 'ImageMetadata' &&
 
-            <div key={product.metadata.title} className="bg-stone-900 rounded-xl border border-yellow-500 overflow-hidden shadow-sm hover:shadow-lg transition w-full p-1" onClick={() => router.push(`/shop/product/${product.id}?fromTab=Shop`)}>
+            <div key={product.metadata.title} className="bg-stone-900 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition w-full" onClick={() => router.push(`/shop/product/${product.id}?fromTab=Shop`)}>
               <img
                 src={product.metadata.image.item}
                 alt={product.metadata.title!}
-                className="w-full h-36 object-contain"
+                className="w-full h-48 object-fit"
               />
               <div className="p-3">
                 <h3 className="text-lg font-semibold text-white">{product.metadata.title}</h3>
@@ -126,7 +128,7 @@ const ShopGrid = ({address}: PostsFeedProps) => {
                 {
                   product.metadata.attributes[1].value === 'Digital' ?
                   
-                  <button className='btn btn-warning w-full'>Buy Now</button> 
+                  <button className='btn btn-warning w-full text-black'>Buy Now</button> 
                   : 
                   <a
                     href={product.metadata.attributes[4].value}

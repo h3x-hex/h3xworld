@@ -63,7 +63,7 @@ const ClubsTab = ({address}: PostsFeedProps) => {
 
 
   return (
-    <div className="bg-black text-white p-5 h-full pb-32">
+    <div className="bg-stone-950 text-white p-5 h-full pb-32">
       <h2 className="text-2xl font-bold text-yellow-500 mb-6">Your Clubs</h2>
 
       {clubList.length === 0 && !isLoading? (

@@ -4,27 +4,9 @@ import { FC, useEffect, useState } from 'react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { searchUsers } from '@/actions/search';
 
-type User = {
-  name: string;
-  username: string;
-};
-
 type NewMessageModalProps = {
   onClose: () => void;
 };
-
-const users: User[] = [
-  { name: 'Lena Brooks', username: 'lenabrooks' },
-  { name: 'Carlos Diaz', username: 'carlos.dz' },
-  { name: 'Fatima Khan', username: 'fatimak' },
-  { name: 'Leo Zhang', username: 'leo_zh' },
-  { name: 'Maya Patel', username: 'mayapatel_' },
-  { name: 'Jonas Berg', username: 'jonasb' },
-  { name: 'Sara Müller', username: 'saramuller' },
-  { name: 'Ali Reza', username: 'ali.rezaa' },
-  { name: 'Nina Park', username: 'ninaparkkk' },
-  { name: 'Omar Said', username: 'omarsaid' },
-];
 
 const NewMessageModal: FC<NewMessageModalProps> = ({ onClose }) => {
   const [query, setQuery] = useState('')

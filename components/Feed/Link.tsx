@@ -46,7 +46,7 @@ const LinksGrid = ({address}: PostsFeedProps) => {
   }, [address])
 
   return (
-    <div className="bg-black min-h-screen text-white p-5">
+    <div className="bg-stone-950 min-h-screen text-white p-5">
       <h2 className="text-2xl font-bold text-yellow-500 mb-6">Links</h2>
 
       <div className="flex flex-col gap-4">

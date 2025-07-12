@@ -50,7 +50,7 @@ const H3xclusiveTiers = ({address}: PostsFeedProps) => {
   
   return (
     <>
-    <div className="bg-black min-h-screen text-white p-5">
+    <div className="bg-stone-950 min-h-screen text-white p-5">
       <h2 className="text-2xl font-bold text-yellow-500 mb-4 text-center">h3xclusive</h2>
       <div className='flex flex-row mx-auto justify-center pb-3'>  
         <button className="btn btn-warning btn-outline w-24">Posts</button>

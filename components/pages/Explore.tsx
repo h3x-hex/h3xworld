@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import SearchBar from '../SearchBar'
+import SearchBar from '../nav/SearchBar'
 import BottomNav from '@/components/nav/BottomNav'
 import Navbar from '@/components/nav/Navbar'
 import MediaQuery from 'react-responsive'

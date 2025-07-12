@@ -66,15 +66,6 @@ const Create: React.FC = () => {
     },
   ], [])
 
-  // Memoize navigation handlers
-  const handleBack = useCallback(() => {
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      window.history.back()
-    } else {
-      router.push('/')
-    }
-  }, [router])
-
   const handleItemClick = useCallback((link: string) => {
     router.push(`/create/${link}`)
   }, [router])
@@ -120,7 +111,7 @@ const Create: React.FC = () => {
       {/* Header */}
       <header className="relative flex items-center justify-center pt-6 pb-4">
         <button
-          onClick={handleBack}
+          onClick={() => router.push('/home')}
           className="absolute left-4 p-2 rounded-full btn-ghost bg-transparent border-none transition-colors"
           aria-label="Go back"
         >

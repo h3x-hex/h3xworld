@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { getChatsForUser } from '@/actions/chat'
-import SearchBar from '../SearchBar'
+import SearchBar from '../nav/SearchBar'
 import BottomNav from '../nav/BottomNav';
 import { useRouter } from 'next/navigation';
 import { ChevronLeftIcon, PencilSquareIcon } from '@heroicons/react/24/outline'

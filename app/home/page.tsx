@@ -1,10 +1,10 @@
-import HomeFeed from '@/components/pages/Home';
+import HomeWrapper from '@/components/pages/HomeWrapper';
 import React from 'react'
 
 const HomePage = () => {
   
   return(
-    <HomeFeed/>
+    <HomeWrapper/>
   )
   
 }

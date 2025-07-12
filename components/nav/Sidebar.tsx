@@ -14,8 +14,6 @@ import { useAtom } from 'jotai'
 import { userAtom } from '@/store/authState'
 import { useRouter } from 'next/navigation'
 
-
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }

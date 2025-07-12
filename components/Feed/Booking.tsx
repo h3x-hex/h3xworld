@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Image from 'next/image'
+import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
 
 interface PostsFeedProps {
   address: string;
@@ -34,29 +35,34 @@ const BookingTab = ({address}: PostsFeedProps) => {
   }
 
   return (
-    <div className="w-[96%] max-w-sm mx-auto rounded-xl overflow-hidden border border-yellow-500">
-      <div className="relative rounded-xl bg-black text-white overflow-hidden">
-        <Image src="/bookingThumbnail.png" alt="Photoshoot" width={400} height={200} className="w-full h-48 object-cover" />
-
-        <div className="absolute top-2 right-2">
-          <div className="h-6 w-6 rounded-full bg-yellow-500" />
-        </div>
-
-        <div className="p-4 flex flex-col justify-between h-full">
+    <div className="w-[96%] max-w-sm mx-auto rounded-xl overflow-hidden border border-gray-700 hover:border-yellow-500 mt-3 px-3 py-3 cursor-pointer">
+      <div className="relative rounded-xl bg-stone-950 text-white overflow-hidden ">
+        <div className="flex flex-col justify-between h-full ">
           <div className='flex flex-row gap-24'>
             <div className="mb-4 flex flex-col">
-              <h3 className="text-lg font-semibold">Personal Training</h3>
-              <p className="text-sm text-gray-300 mt-1">1 Hour – $36.9</p>
+              <h3 className="text-xl font-semibold">Personal Training</h3>
+              <p className="text-md text-gray-300 mt-1">1 Hour – $36.9</p>
+              <p className="text-sm text-yellow-400 mt-1">⭐ 4.8 (120 ratings)</p>
             </div>
-            <p className="text-xs text-yellow-400 mt-1">⭐ 4.9 (120 ratings)</p>
           </div>
-          <button
-            onClick={() => setOpenModal(true)}
-            className="w-fit bg-yellow-500 text-black text-sm font-semibold py-2 px-4 rounded-full hover:scale-105 transition"
-          >
-            Book Now
-          </button>
         </div>
+      </div>
+
+      <Image src="/bookingThumbnail.png" alt="Photoshoot" width={400} height={200} className="w-full h-48 object-cover" />
+
+      <div className='flex flex-row py-3 px-4 gap-6'>
+        <button
+          onClick={() => setOpenModal(true)}
+          className="w-64 bg-yellow-500 text-black text-sm font-semibold py-2 px-6 rounded-full hover:scale-105 transition "
+        >
+          Book Now
+        </button>
+        <button
+          onClick={() => setOpenModal(true)}
+          className="text-yellow-500 text-sm font-semibold rounded-full hover:scale-105 transition "
+        >
+          <ChatBubbleOvalLeftEllipsisIcon width={36} color='#FFFFFF' className='hover:text-yellow-500 '/>
+        </button>
       </div>
 
       {openModal && (

@@ -57,7 +57,7 @@ const PostsFeed = ({address}: PostsFeedProps) => {
   }, []);
 
   return (
-    <div className="bg-black min-h-screen text-white px-3">
+    <div className="bg-stone-950 min-h-screen text-white pl-2 pr-1">
       {posts && posts.map((post) => (
         <PostCard key={post.id} postItem={post}/>
       ))}
