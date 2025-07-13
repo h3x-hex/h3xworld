@@ -3,6 +3,10 @@
 import { FC, useEffect, useState } from 'react';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { searchUsers } from '@/actions/search';
+import { getChatBetweenUsers, createChat } from '@/actions/chat';
+import { useRouter } from 'next/navigation';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/store/authState';
 
 type NewMessageModalProps = {
   onClose: () => void;
@@ -12,6 +16,20 @@ const NewMessageModal: FC<NewMessageModalProps> = ({ onClose }) => {
   const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[]>([])
+  const [user] = useAtom(userAtom)
+  const router = useRouter()
+
+  const handleSelectUser = async (selected: any) => {
+    if (!user.id) return
+    let chat = await getChatBetweenUsers(user.id, selected.id)
+    if (!chat) {
+      chat = await createChat({ participants: [user.id, selected.id] })
+    }
+    if (chat) {
+      router.push(`/chats/${chat.id}`)
+      onClose()
+    }
+  }
 
   useEffect(() => {
     const handler = setTimeout(async () => {
@@ -60,8 +78,12 @@ const NewMessageModal: FC<NewMessageModalProps> = ({ onClose }) => {
                       results.length > 0 && (
                         <ul className="absolute z-10 w-full mt-1 bg-stone-900 border border-gray-700 rounded-md text-gray-300 max-h-60 overflow-y-auto">
                           {results.map(user => (
-                            <li key={user.id} className="p-2 hover:bg-stone-800">
-                              <a href={`/${user.username}`}>{user.username || user.name}</a>
+                            <li
+                              key={user.id}
+                              className="p-2 hover:bg-stone-800 cursor-pointer"
+                              onClick={() => handleSelectUser(user)}
+                            >
+                              {user.username || user.name}
                             </li>
                           ))}
                         </ul>
