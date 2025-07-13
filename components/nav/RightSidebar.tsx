@@ -1,135 +1,150 @@
-'use client'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { TrendingUp, Hash, UserPlus, Search } from "lucide-react";
 
-import {
-  ChatBubbleOvalLeftEllipsisIcon,
-  BuildingStorefrontIcon,
-  PresentationChartBarIcon,
-  WalletIcon,
-  UserIcon,
-  BellIcon,
-  HomeIcon,
-  MagnifyingGlassIcon,
-  EllipsisHorizontalIcon
-} from '@heroicons/react/24/outline'
-import useNavigation from '@/hooks/useNavigation'
-import MediaQuery from 'react-responsive'
+const trendingTopics = [
+  { tag: "#DigitalArt", posts: "45.2K posts" },
+  { tag: "#NFT", posts: "23.8K posts" },
+  { tag: "#CreativeDesign", posts: "18.5K posts" },
+  { tag: "#ArtCommunity", posts: "12.3K posts" },
+  { tag: "#Photography", posts: "9.7K posts" }
+];
 
+const suggestedUsers = [
+  {
+    username: "artcreator_23",
+    displayName: "Sarah Chen",
+    avatar: "/placeholder.svg",
+    isVerified: true,
+    followers: "2.3K"
+  },
+  {
+    username: "designpro",
+    displayName: "Mike Johnson",
+    avatar: "/placeholder.svg",
+    isVerified: false,
+    followers: "1.8K"
+  },
+  {
+    username: "photoart_studio",
+    displayName: "Luna Studios",
+    avatar: "/placeholder.svg",
+    isVerified: true,
+    followers: "5.2K"
+  }
+];
 
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
-
-const RightSidebar = () => {
-
-  const {
-    isHomeActive,
-    isExploreActive,
-    isNotificationsActive,
-    isProfileActive,
-    isChatActive,
-    isWalletActive,
-    isMarketplaceActive,
-    isDashboardActive,
-  } = useNavigation();
-
-  const navigation = [
-    { name: 'Home', href: '/home', icon: HomeIcon, current: isHomeActive },
-    { name: 'Explore', href: '/explore', icon: MagnifyingGlassIcon, current: isExploreActive },
-    { name: 'Notifications', href: '/notifications', icon: BellIcon, current: isNotificationsActive },
-    { name: 'Chats', href: '/chats', icon: ChatBubbleOvalLeftEllipsisIcon, current: isChatActive },
-    { name: 'Profile', href: '/profile', icon: UserIcon, current: isProfileActive },
-    { name: 'Wallet', href: '/wallet', icon: WalletIcon, current: isWalletActive },
-    { name: 'Marketplace', href: '/marketplace', icon: BuildingStorefrontIcon, current: isMarketplaceActive },
-    { name: 'Dashboard', href: '/dashboard', icon: PresentationChartBarIcon, current: isDashboardActive },
-    { name: 'More', href: '/home', icon: EllipsisHorizontalIcon, current: isDashboardActive },
-  ]
-
+export const RightSidebar = () => {
   return (
-    <div>
-      <MediaQuery minWidth={551} maxWidth={1279}>
-        <div>
-          {/* Static sidebar for desktop */}
-          <div className="fixed inset-y-0 z-50 flex w-20 flex-col">
-            {/* Sidebar component, swap this element with another sidebar if you like */}
-            <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-stone-950 px-3 border-r-[2px] border-gray-600">
-              <div className="flex h-16 shrink-0 items-center">
-                <img
-                  alt="Your Company"
-                  src="/logo.png"
-                  width={48}
-                  className="pl-2"
-                />
+    <div className="w-80 space-y-4 p-4">
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input 
+          placeholder="Search posts, users, tags..." 
+          className="pl-10 bg-muted/50 border-border focus:border-creator-gold"
+        />
+      </div>
+      {/* Trending Topics */}
+      <Card className="bg-gradient-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-primary" />
+            Trending for you
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {trendingTopics.map((topic, index) => (
+            <div
+              key={topic.tag}
+              className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                  <span className="text-sm font-bold text-primary">#{index + 1}</span>
+                </div>
+                <div>
+                  <div className="font-medium text-foreground flex items-center gap-1">
+                    <Hash className="w-4 h-4 text-muted-foreground" />
+                    {topic.tag.slice(1)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">{topic.posts}</div>
+                </div>
               </div>
-              <nav className="flex flex-1 flex-col">
-                <ul role="list" className="flex flex-1 flex-col gap-y-7 mx-auto pl-1">
-                  <li>
-                    <ul role="list" className=" space-y-3 mx-auto">
-                      {navigation.map((item, idx) => (
-                        <div className="tooltip tooltip-right" data-tip={item.name} key={idx}>
-                        <li key={item.name} className='mx-auto'>
-                          
-                            <a
-                              href={item.href}
-                              className={classNames(
-                                item.current
-                                  ? 'bg-stone-900 text-yellow-500'
-                                  : 'text-gray-300 hover:bg-stone-900 hover:text-yellow-500',
-                                'group flex gap-x-3 rounded-full p-2 text-lg font-semibold w-12',
-                              )}
-                            >
-                              <item.icon aria-hidden="true" className="size-7 shrink-0 mx-auto" />
-                            </a>
-                          
-                        </li>
-                        </div>
-                      ))}
-                    </ul>
-                  </li>
-                  <li className='mx-auto'>
-                    <button className='btn btn-outline border-yellow-500 rounded-full text-yellow-500 hover:bg-yellow-500 hover:text-black w-10 h-10 text-2xl font-bold pb-2'>+</button>
-                  </li>
-                  <li className="-mx-6 mt-auto">
-                    <a
-                      href="#"
-                      className="flex items-center gap-x-4 px-6 py-3 text-sm/6 font-semibold text-white hover:bg-stone-900 border-t-2 border-gray-600"
-                    >
-                      <img
-                        alt=""
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        className="size-8 rounded-full bg-gray-800"
-                      />
-                      <span className="sr-only">Your profile</span>
-                      <span aria-hidden="true">Tom Cook</span>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
             </div>
-          </div>
+          ))}
+          <Button variant="ghost" className="w-full text-primary hover:text-primary-glow">
+            Show more
+          </Button>
+        </CardContent>
+      </Card>
 
-          <main className="py-10 lg:pl-72">
-            <div className="px-4 sm:px-6 lg:px-8">{/* Your content */}</div>
-          </main>
-        </div>
-      </MediaQuery>
-      <MediaQuery minWidth={1280} maxWidth={99999}>
-        <div>
-          {/* Static sidebar for desktop */}
-          <div className="fixed right-0 inset-y-0 z-50 flex w-96 flex-col">
-            {/* Sidebar component, swap this element with another sidebar if you like */}
-            <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-stone-950 px-6 border-l-[1px] border-gray-600">
-              
+      {/* Who to Follow */}
+      <Card className="bg-gradient-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-primary" />
+            Who to follow
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {suggestedUsers.map((user) => (
+            <div key={user.username} className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src={user.avatar} alt={user.displayName} />
+                  <AvatarFallback>{user.displayName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1">
+                    <p className="font-medium text-foreground truncate">{user.displayName}</p>
+                    {user.isVerified && (
+                      <Badge variant="secondary" className="text-xs px-1">✓</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">@{user.username}</p>
+                  <p className="text-xs text-muted-foreground">{user.followers} followers</p>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" className="hover:bg-primary hover:text-primary-foreground">
+                Follow
+              </Button>
             </div>
-          </div>
+          ))}
+          <Button variant="ghost" className="w-full text-primary hover:text-primary-glow">
+            Show more
+          </Button>
+        </CardContent>
+      </Card>
 
-          <main className="lg:pl-72">
-            <div className="px-4 sm:px-6 lg:px-8">{/* Your content */}</div>
-          </main>
-        </div>
-      </MediaQuery>
+      {/* What's Happening */}
+      <Card className="bg-gradient-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold text-foreground">
+            What's happening
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+            <div className="text-sm text-muted-foreground">Trending in Art</div>
+            <div className="font-medium text-foreground">Digital Art Revolution</div>
+            <div className="text-sm text-muted-foreground">15.2K posts</div>
+          </div>
+          <div className="p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+            <div className="text-sm text-muted-foreground">Creative Community</div>
+            <div className="font-medium text-foreground">New Creator Fund Launch</div>
+            <div className="text-sm text-muted-foreground">8.9K discussing</div>
+          </div>
+          <div className="p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+            <div className="text-sm text-muted-foreground">Technology</div>
+            <div className="font-medium text-foreground">AI Art Tools Update</div>
+            <div className="text-sm text-muted-foreground">12.4K posts</div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
-  )
-}
-
-export default RightSidebar
+  );
+};

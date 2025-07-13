@@ -17,7 +17,7 @@ const useNavigation = () => {
   const [isMarketplaceActive, setIsMarketplaceActive] = useState(false);
   const [isDashboardActive, setIsDashboardActive] = useState(false);
   const [isSettingsActive, setIsSettingsActive] = useState(false);
-
+  const [isCreateActive, setIsCreateActive] = useState(false);
 
   const [user] = useAtom(userAtom);
 
@@ -31,6 +31,7 @@ const useNavigation = () => {
     setIsMarketplaceActive(false);
     setIsDashboardActive(false);
     setIsSettingsActive(false);
+    setIsCreateActive(false)
 
     switch (pathname) {
       case '/home':
@@ -57,6 +58,8 @@ const useNavigation = () => {
       case '/settings':
         setIsSettingsActive(true);
         break;
+      case '/create':
+        setIsCreateActive(true);
       case `/${user.username}`:
         setIsProfileActive(true);
         break;
@@ -76,7 +79,8 @@ const useNavigation = () => {
     isWalletActive,
     isMarketplaceActive,
     isDashboardActive,
-    isSettingsActive
+    isSettingsActive,
+    isCreateActive
   };
 };
 
